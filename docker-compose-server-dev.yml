@@ -22,7 +22,7 @@ services:
     image: nginx:latest
     container_name: mykid-nginx
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx-server-dev.conf
       - ./logs:/var/logs/nginx
       - ./react-client/build:/www-nginx/mykid
     ports:

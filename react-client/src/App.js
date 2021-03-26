@@ -15,7 +15,7 @@ const TEMPERATURES = [37.6, 37.5, 37.4, 37.3, 37.2, 37.1, 37, 36.9, 36.8, 36.7, 
 const FOOD_DURATION = [5, 10, 15, 20, 25, 30]
 const FOOD_QUANTITIES = [5, 10, 15, 20, 25, 30]
 
-const API_URL = 'https://mykid.jzeratul.tech/mykid/api/v1/stats';
+const API_URL = '/mykid/api/v1/stats';
 
 function App() {
 

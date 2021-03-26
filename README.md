@@ -44,7 +44,12 @@ $> docker build . -t mykid-service:0.0.1
 $> docker images
 REPOSITORY        TAG                      IMAGE ID       CREATED         SIZE
 mykid-service     0.0.1                    064000d92bae   4 seconds ago   534MB
+```
 
+By default we use the `react-client/build` folder for the `nginx` static files. One must build the FE before using this setup.
+Alternatively, use the `docker-compose -f docker-compose-react-dev.yml/docker-compose-server-dev.yml up` for frontend/backend respectively.
+
+```bash
 $> docker-compose up
 ```
 
