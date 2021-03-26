@@ -64,6 +64,6 @@ $> docker-compose up
 
 
 ### app screenshots
-![](doc/Screenshot 2021-03-26 at 15.05.29.png)
-![](doc/Screenshot 2021-03-26 at 23.44.16.png)
-![](doc/Screenshot 2021-03-26 at 23.44.30.png)
+![](doc/Screenshot1.png)
+![](doc/Screenshot2.png)
+![](doc/Screenshot3.png)
