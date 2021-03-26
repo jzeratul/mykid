@@ -1,13 +1,17 @@
 import './App.css'
 import React, { useState, useEffect } from "react"
-import { Button, InputGroup, Table, Tab, FormControl, Container, Form, Row, Card } from "react-bootstrap"
+import { Button, InputGroup, Table, Tab, FormControl, Container, Form, Row, Card, DropdownButton, SplitButton, ButtonGroup, Dropdown } from "react-bootstrap"
 import Tabs from 'react-bootstrap/Tabs'
 import axios from "axios"
-import { IconArrowBarLeft, IconArrowBarRight, IconCapture, IconClock, IconEraser, IconGlassFull, IconMask, IconMoodKid } from '@tabler/icons'
+import { IconArrowBarLeft, IconArrowBarRight, IconCapture, IconClock, IconEraser, IconFloatLeft, IconFloatRight, IconGlassFull, IconMask, IconMoodKid } from '@tabler/icons'
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import TRANSLATIONS from "./translations"
-import { Chart } from 'react-charts'
+import {
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, ReferenceLine, ReferenceArea,
+  ReferenceDot, Tooltip, CartesianGrid, Legend, Brush, ErrorBar, AreaChart, Area,
+  Label, LabelList, BarChart, Bar, ComposedChart
+} from 'recharts';
 
 
 const GENERIC_ACTIVITIES = ["BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "SPIT", "URINE", "POOP", "VITAMIN_D", "VITAMIN_K", "TEMPERATURE", "PUMP", "WEIGHT"]
@@ -35,73 +39,8 @@ function App() {
   const [newRecord, setNewRecord] = useState({ ...empty_record })
 
   const [records, setRecords] = useState([])
-  const [graphdata, setGraphdata] = useState({})
-
-  // useEffect(() => {
-
-  //   return axios.get(`${API_URL}`).then(
-  //     (response) => {
-  //       console.log(response.data)
-  //       setRecords(response.data.stats);
-  //     },
-  //     (error) => {
-  //       console.log(error)
-  //     }
-  //   )
-  // }, [])
-
-  const statsTabSelected = (eventKey, event) => {
-
-    if (eventKey === "stats") {
-
-      axios.get(`${API_URL}`).then(
-        (response) => {
-          console.log(response.data)
-          setRecords(response.data.stats);
-        },
-        (error) => {
-          console.log(error)
-        }
-      )
-    } else if (eventKey === "graphs") {
-
-
-      axios.get(`${API_URL}`).then(
-        (response) => {
-
-          // const data = [{
-          //   label: 'Weight/Time',
-          //   // data: response.data.stats.filter(r => r.weight !== null && r.weight !== undefined).map(r => [r.datetime, r.weight])
-          //   data: [[0, 1], [1, 2], [2, 4], [3, 2], [4, 7]]
-          // }]
-
-          // setGraphdata(data)
-
-          // console.log(data)
-        },
-        (error) => {
-          console.log(error)
-        }
-      )
-
-      // const data = React.useMemo(
-      //   () => [
-      //     {
-      //       label: 'Series 1',
-      //       data: [[0, 1], [1, 2], [2, 4], [3, 2], [4, 7]]
-      //     },
-      //     {
-      //       label: 'Series 2',
-      //       data: [[0, 3], [1, 1], [2, 5], [3, 6], [4, 4]]
-      //     }
-      //   ],
-      //   []
-      // )
-    }
-
-
-
-  }
+  const [graph1, setGraph1] = useState([])
+  const [graph2, setGraph2] = useState([])
 
   const updateGenericActivity = (activity) => {
 
@@ -242,13 +181,11 @@ function App() {
   }
 
   const submit = () => {
-    console.log(newRecord)
 
     newRecord.createdAt = new Date()
 
     axios.post(`${API_URL}`, newRecord).then(
       () => {
-        console.log("SAVED")
         setNewRecord({ ...empty_record })
       },
       (error) => {
@@ -294,30 +231,130 @@ function App() {
         qty += rec.extraBottleFormulaeMilkQuantity
       }
     }
+    if (qty === 0) qty = ''
     return qty
   }
 
-  const data = React.useMemo(
-    () => [
-      {
-        label: 'Series 1',
-        data: [[0, 1], [1, 2], [2, 4], [3, 2], [4, 7]]
-      },
-      {
-        label: 'Series 2',
-        data: [[0, 3], [1, 1], [2, 5], [3, 6], [4, 4]]
-      }
-    ],
-    []
-  )
+  const statsTabSelected = (eventKey, event) => {
 
-  const axes = React.useMemo(
-    () => [
-      { primary: true, type: 'linear', position: 'bottom' },
-      { type: 'linear', position: 'left' }
-    ],
-    []
-  )
+    if (eventKey === "stats") {
+
+      axios.get(`${API_URL}`).then(
+        (response) => {
+          setRecords(filter(response.data.stats));
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    } else if (eventKey === "graphs") {
+
+      axios.get(`${API_URL}`).then(
+        (response) => {
+          setRecords(response.data.stats)
+          setGraph1Data(response.data.stats)
+          setGraph2Data(response.data.stats)
+        },
+        (error) => {
+          console.log(error)
+        })
+    }
+  }
+
+  const formatDate = (date) => {
+
+    let day = ('0' + date.getDate()).slice(-2);
+    let month = ('0' + (date.getMonth() + 1)).slice(-2);
+    let year = date.getFullYear();
+
+    return `${day}-${month}-${year}`
+  }
+
+  const formatDateTime = (date) => {
+
+    let day = ('0' + date.getDate()).slice(-2)
+    let month = ('0' + (date.getMonth() + 1)).slice(-2)
+    let year = date.getFullYear()
+    let hours = ('0' + date.getHours()).slice(-2)
+    let minutes = ('0' + date.getMinutes()).slice(-2)
+    // let seconds = ('0' + date.getSeconds()).slice(-2)
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`
+  }
+
+  const filter = (stats) => {
+    return stats.map(function (s, idx) {
+      s.datetime = formatDateTime(new Date(s.datetime))
+      return s
+    })
+  }
+
+  const setGraph1Data = (stats) => {
+    // filter out the weights from the same day, and take the latest non empty value measured during the day
+
+    let weightTime = stats.map(function (s, idx) {
+      return {
+        datetime: new Date(s.datetime),
+        weight: s.weight
+      }
+    })
+      // we need only the entries that have a weight
+      .filter(stat => !isNaN(stat.weight))
+      .sort((s1, s2) => s1.datetime - s2.datetime)
+      .map(function (s, idx) {
+        return {
+          datetime: formatDate(s.datetime),
+          weight: s.weight
+        }
+      })
+    // .reduce((stat1, stat2) => {
+
+    //   let day1 = ('0' + stat1.datetime.getDate()).slice(-2)
+    //   let month1 = ('0' + (stat1.datetime.getMonth() + 1)).slice(-2)
+    //   let year1 = stat1.datetime.getFullYear()
+
+    //   let day2 = ('0' + stat2.datetime.getDate()).slice(-2)
+    //   let month2 = ('0' + (stat2.datetime.getMonth() + 1)).slice(-2)
+    //   let year2 = stat2.datetime.getFullYear()
+
+
+    //   if (year1 === year2 && month1 === month2 && day1 === day2) {
+    //     if (day1 > day2) { // same day but different time, we take the most recent one with a non null weight
+    //       return stat1
+    //     } else {
+    //       return stat2
+    //     }
+    //   } else {
+    //     return [stat1, stat2]
+    //   }
+
+    // })
+    // .map(function (s, idx) {
+    //   return {
+    //     datetime: formatDate(s.datetime),
+    //     weight: s.weight
+    //   }
+    // })
+
+    setGraph1(weightTime)
+  }
+
+  const setGraph2Data = (stats) => {
+
+    let data = stats.map(function (s, idx) {
+      return {
+        datetime: formatDate(new Date(s.datetime)),
+        eat1: s.extraBottleFormulaeMilkQuantity,
+        eat2: s.extraBottleMotherMilkQuantity,
+        eat3: s.feedFromLeftDuration,
+        eat4: s.feedFromRightDuration,
+      }
+    })
+    setGraph2(data)
+
+
+    console.log(data)
+  }
 
   return (
     <main>
@@ -627,7 +664,7 @@ function App() {
                 <tr>
                   <th>Time</th>
                   <th>Eaten Time</th>
-                  <th>Eaten Extra qty</th>
+                  <th>Extra qty</th>
                   <th>Weight</th>
                 </tr>
               </thead>
@@ -637,7 +674,12 @@ function App() {
                   return (
                     <tr key={idx} >
                       <td>{r.datetime}</td>
-                      <td>{calculateTotalEatenTime(r)}</td>
+                      <td><p> {calculateTotalEatenTime(r)}</p>
+                        {r.pumpFromLeftQuantity > 0 && <div><small>Pump Left {r.pumpFromLeftQuantity}mL</small></div>}
+                        {r.pumpFromRightQuantity > 0 && <div><small>Pump Right {r.pumpFromRightQuantity}mL</small></div>}
+                        {r.feedFromLeftDuration > 0 && <div><small>Feed Left {r.feedFromLeftDuration} min</small></div>}
+                        {r.feedFromRightDuration > 0 && <div><small>Feed Right {r.feedFromRightDuration} min</small></div>}
+                      </td>
                       <td>{calculateTotalEatenQty(r)}</td>
                       <td>{r.weight}</td>
                     </tr>
@@ -647,12 +689,63 @@ function App() {
             </Table>
           </Tab>
           <Tab eventKey="graphs" title="Graphs">
-            <Chart data={data} axes={axes} tooltip />
+            <div className="mt-5">
+
+              <ResponsiveContainer minWidth={200} minHeight={400}>
+                <ComposedChart
+                  width={500}
+                  height={400}
+                  data={graph1}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="datetime" />
+                  <YAxis />
+                  < Tooltip />
+                  <Legend />
+                  <Bar type="monotone" dataKey="weight" fill="#8884d8" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="mt-5">
+
+              <ResponsiveContainer>
+                <ComposedChart minWidth={200} minHeight={400}
+                  width={500}
+                  height={400}
+                  data={graph2}
+                // margin={{
+                //   top: 20,
+                //   right: 20,
+                //   bottom: 20,
+                //   left: 20,
+                // }}
+                >
+                  <CartesianGrid stroke="#f5f5f5" />
+                  <XAxis dataKey="datetime" scale="band" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar type="monotone" dataKey="eat1" fill="#8884d8" />
+                  <Bar type="monotone" dataKey="eat2" fill="#880088" />
+                  <Bar type="monotone" dataKey="eat3" fill="#FF84AA" />
+                  <Bar type="monotone" dataKey="eat4" fill="#88FFCC" />
+                </ComposedChart>
+
+              </ResponsiveContainer>
+            </div>
+
           </Tab>
         </Tabs>
       </Container>
     </main >
-  );
+  )
 }
 
 export default App

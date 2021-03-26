@@ -64,8 +64,8 @@ public class DataStore {
             db.getFeedFromRightDuration(),
             db.getPumpFromLeftQuantity(),
             db.getPumpFromRightQuantity(),
-            db.getWeight(),
             db.getExtraBottleMotherMilkQuantity(),
+            db.getWeight(),
             db.getExtraBottleFormulaeMilkQuantity(),
             db.getCreatedAt()
     );
