@@ -1,9 +1,3 @@
-### playground with hexagonal architecture
-
-![](spring-boot-server/doc/architecture.png)
-
-![](spring-boot-server/doc/dataflow.png)
-
 ### prerequisites
 ```bash
 $> nvm list
@@ -54,12 +48,8 @@ mykid-service     0.0.1                    064000d92bae   4 seconds ago   534MB
 $> docker-compose up
 ```
 
+### playground with hexagonal architecture
 
+![](spring-boot-server/doc/architecture.png)
 
-
-### run 
-```bash
-
-$> cd 
-
-```
+![](spring-boot-server/doc/dataflow.png)
