@@ -1,3 +1,5 @@
+This is a reactjs based project with a spring boot backend running with openapi 3.0 and java 16.
+
 ### prerequisites
 ```bash
 $> nvm list
