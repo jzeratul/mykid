@@ -52,4 +52,5 @@ $> docker-compose up
 
 ![](spring-boot-server/doc/architecture.png)
 
+### deployment components
 ![](spring-boot-server/doc/dataflow.png)
