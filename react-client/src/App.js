@@ -41,6 +41,7 @@ function App() {
   const [records, setRecords] = useState([])
   const [graph1, setGraph1] = useState([])
   const [graph2, setGraph2] = useState([])
+  const [graph3, setGraph3] = useState([])
 
   const updateGenericActivity = (activity) => {
 
@@ -254,6 +255,7 @@ function App() {
           setRecords(response.data.stats)
           setGraph1Data(response.data.stats)
           setGraph2Data(response.data.stats)
+          setGraph3Data(response.data.stats)
         },
         (error) => {
           console.log(error)
@@ -292,7 +294,7 @@ function App() {
   const setGraph1Data = (stats) => {
     // filter out the weights from the same day, and take the latest non empty value measured during the day
 
-    let weightTime = stats.map(function (s, idx) {
+    let data = stats.map(function (s, idx) {
       return {
         datetime: new Date(s.datetime),
         weight: s.weight
@@ -303,55 +305,37 @@ function App() {
       .sort((s1, s2) => s1.datetime - s2.datetime)
       .map(function (s, idx) {
         return {
-          datetime: formatDate(s.datetime),
+          datetime: formatDateTime(s.datetime),
           weight: s.weight
         }
       })
-    // .reduce((stat1, stat2) => {
-
-    //   let day1 = ('0' + stat1.datetime.getDate()).slice(-2)
-    //   let month1 = ('0' + (stat1.datetime.getMonth() + 1)).slice(-2)
-    //   let year1 = stat1.datetime.getFullYear()
-
-    //   let day2 = ('0' + stat2.datetime.getDate()).slice(-2)
-    //   let month2 = ('0' + (stat2.datetime.getMonth() + 1)).slice(-2)
-    //   let year2 = stat2.datetime.getFullYear()
-
-
-    //   if (year1 === year2 && month1 === month2 && day1 === day2) {
-    //     if (day1 > day2) { // same day but different time, we take the most recent one with a non null weight
-    //       return stat1
-    //     } else {
-    //       return stat2
-    //     }
-    //   } else {
-    //     return [stat1, stat2]
-    //   }
-
-    // })
-    // .map(function (s, idx) {
-    //   return {
-    //     datetime: formatDate(s.datetime),
-    //     weight: s.weight
-    //   }
-    // })
-
-    setGraph1(weightTime)
+    setGraph1(data)
   }
 
   const setGraph2Data = (stats) => {
 
     let data = stats.map(function (s, idx) {
       return {
-        datetime: formatDate(new Date(s.datetime)),
-        eat1: s.extraBottleFormulaeMilkQuantity,
-        eat2: s.extraBottleMotherMilkQuantity,
-        eat3: s.feedFromLeftDuration,
-        eat4: s.feedFromRightDuration,
+        datetime: formatDateTime(new Date(s.datetime)),
+        FormulaBottle: s.extraBottleFormulaeMilkQuantity,
+        MotherBottle: s.extraBottleMotherMilkQuantity
       }
     })
     setGraph2(data)
 
+    console.log(data)
+  }
+
+  const setGraph3Data = (stats) => {
+
+    let data = stats.map(function (s, idx) {
+      return {
+        datetime: formatDateTime(new Date(s.datetime)),
+        LeftTime: s.feedFromLeftDuration,
+        RightTime: s.feedFromRightDuration
+      }
+    })
+    setGraph3(data)
 
     console.log(data)
   }
@@ -689,54 +673,42 @@ function App() {
             </Table>
           </Tab>
           <Tab eventKey="graphs" title="Graphs">
-            <div className="mt-5">
 
-              <ResponsiveContainer minWidth={200} minHeight={400}>
-                <ComposedChart
-                  width={500}
-                  height={400}
-                  data={graph1}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
+            <div className="mt-5" style={{ width: '100%' }}>
+              <ResponsiveContainer width="100%" minWidth={500} minHeight={400}>
+                <LineChart width={500} height={400} data={graph1} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="datetime" />
                   <YAxis />
-                  < Tooltip />
+                  <Tooltip />
                   <Legend />
-                  <Bar type="monotone" dataKey="weight" fill="#8884d8" />
-                </ComposedChart>
+                  <Line connectNulls type="monotone" dataKey="weight" stroke="#8884d8" fill="#8884d8" />
+                </LineChart>
               </ResponsiveContainer>
-            </div>
 
-            <div className="mt-5">
-
-              <ResponsiveContainer>
-                <ComposedChart minWidth={200} minHeight={400}
-                  width={500}
-                  height={400}
-                  data={graph2}
-                // margin={{
-                //   top: 20,
-                //   right: 20,
-                //   bottom: 20,
-                //   left: 20,
-                // }}
-                >
-                  <CartesianGrid stroke="#f5f5f5" />
-                  <XAxis dataKey="datetime" scale="band" />
+              <ResponsiveContainer width="100%" minWidth={500} minHeight={400} >
+                <BarChart width={500} height={400} data={graph2} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="datetime" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar type="monotone" dataKey="eat1" fill="#8884d8" />
-                  <Bar type="monotone" dataKey="eat2" fill="#880088" />
-                  <Bar type="monotone" dataKey="eat3" fill="#FF84AA" />
-                  <Bar type="monotone" dataKey="eat4" fill="#88FFCC" />
-                </ComposedChart>
+                  <Bar connectNulls dataKey="FormulaBottle" fill="#8884d8" />
+                  <Bar connectNulls dataKey="MotherBottle" fill="#880088" />
+                </BarChart>
+
+              </ResponsiveContainer>
+
+              <ResponsiveContainer width="100%" minWidth={500} minHeight={400} >
+                <BarChart width={500} height={400} data={graph3} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="datetime" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar connectNulls dataKey="LeftTime" fill="#FF84AA" />
+                  <Bar connectNulls dataKey="RightTime" fill="#88FFCC" />
+                </BarChart>
 
               </ResponsiveContainer>
             </div>
