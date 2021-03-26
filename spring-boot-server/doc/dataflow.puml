@@ -1,0 +1,14 @@
+@startuml
+actor actor1
+agent browser
+node nginx
+folder staticcontent
+cloud "/api/v1/stats" as springboot
+database db
+
+actor1 ==> browser
+browser ==> nginx : localhost/mykid
+nginx ==> staticcontent : nginx serves static content
+nginx ==> springboot : fetch data
+springboot ==> db
+@enduml

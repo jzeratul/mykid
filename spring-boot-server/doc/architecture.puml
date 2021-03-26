@@ -1,0 +1,19 @@
+@startuml
+cloud "some-agent" as agent
+artifact "mykid-rest-adapter" as rest
+hexagon "mykid-domain" as domain
+artifact "mykid-db-adapter" as db
+database database
+file "Openapi Model" as openapimodel #line.dashed;
+file "JDK16 records domain" as mykiddomain #line.dashed;
+file "Database JPA Model" as dbmodel #line.dashed;
+agent ==> rest
+
+domain <-do(0)-> db
+rest <.do(0).> domain
+db ~~> database
+rest .le.> openapimodel
+domain .le.> mykiddomain
+db .le.> dbmodel
+
+@enduml
