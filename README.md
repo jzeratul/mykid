@@ -61,3 +61,9 @@ $> docker-compose up
 
 ### deployment components
 ![](spring-boot-server/doc/dataflow.png)
+
+
+### app screenshots
+![](doc/Screenshot 2021-03-26 at 15.05.29.png)
+![](doc/Screenshot 2021-03-26 at 23.44.16.png)
+![](doc/Screenshot 2021-03-26 at 23.44.30.png)
