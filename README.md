@@ -1,5 +1,9 @@
 ### playground with hexagonal architecture
 
+![](spring-boot-server/doc/architecture.png)
+
+![](spring-boot-server/doc/dataflow.png)
+
 ### prerequisites
 ```bash
 $> nvm list

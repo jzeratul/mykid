@@ -5,7 +5,7 @@
 
 
 ### run local
-  java -Dspring.profiles.active=local -jar mykid-rest-adapter/target/mykid-rest-adapter-0.0.1-SNAPSHOT.jar
+  java -jar mykid-rest-adapter/target/mykid-rest-adapter-0.0.1-SNAPSHOT.jar
   
 ### db connection encryption
     mvn jasypt:encrypt-value -Djasypt.encryptor.password="mykid_key" -Djasypt.plugin.value="jdbc:mysql://mysqldatabase:3306/mykiddb?serverTimezone=UTC&useLegacyDatetimeCode=false"
