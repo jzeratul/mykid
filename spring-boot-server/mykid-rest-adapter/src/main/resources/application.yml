@@ -1,3 +1,6 @@
+server:
+  port: 2021
+
 spring:
   application:
     name: mykid-service
@@ -11,22 +14,19 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-
   datasource:
-#    url: jdbc:mysql://localhost:3306/mykiddb?serverTimezone=UTC&useLegacyDatetimeCode=false
-    url: ENC(uX5x03yJ3L9P2vq7GXp49i30ep3/0BqoKea11BdklnWy2MYW3JCODmKSsXb+U7BLkCFvU0/B67thN7guVzPU19CR5TsmVl2OCwWwHwXY+u1RUUK5Kq1xOT1USAgdyrRxCccnAVMwCcTgwyJDPeC0l9H7d2aGSpUbunaSJsKxIQc=)
+    url: jdbc:mysql://localhost:3306/mykiddb?serverTimezone=UTC&useLegacyDatetimeCode=false
     username: root
-    password: ENC(PJSkKwOqGxR3BCcY64OdVyaMiVMlqOhUtJaI/4aGI1U5adDuhBSgfHSgtH8UkLvu)
+    password: mykid
     hikari:
       maximum-pool-size: 3
 
-logging:
-  level:
-    root: INFO
-
-server:
-  port: 2021
 
 jasypt:
   encryptor:
     password: mykid_key
+
+
+logging:
+  level:
+    root: INFO

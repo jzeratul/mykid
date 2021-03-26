@@ -15,7 +15,7 @@ services:
       MYSQL_PASSWORD: mykid
       MYSQL_ROOT_PASSWORD: mykid
     networks:
-      - database
+      - mykid
 
   nginx:
     image: nginx:latest
@@ -28,4 +28,4 @@ services:
       - 443:443
 
 networks:
-  database:
+  mykid:
