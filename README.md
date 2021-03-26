@@ -1,17 +1,29 @@
+### playground with hexagonal architecture
+
 ### prerequisites
 ```bash
-➜  mykid git:(main) ✗ nvm list
-->     v10.14.2
+$> nvm list
+v10.14.2
 ```
+
 ```bash
-➜  mykid git:(main) ✗ mvn -v
+$> mvn -v
 Apache Maven 3.5.2
 ```
+
 ```bash
-➜  mykid git:(main) ✗ java -version
+$> java -version
 openjdk version "16" 2021-03-16
-OpenJDK Runtime Environment (build 16+36-2231)
-OpenJDK 64-Bit Server VM (build 16+36-2231, mixed mode, sharing)
+```
+
+```bash
+$> docker -v
+Docker version 20.10.5
+```
+
+```bash
+$> docker-compose -v
+docker-compose version 1.28.5
 ```
 
 ### build
@@ -25,25 +37,25 @@ $> npm run start
 ```bash
 $> cd spring-boot-server
 $> mvn clean install
-
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary for My Kid 0.0.1-SNAPSHOT:
-[INFO] 
-[INFO] My Kid ............................................. SUCCESS [  0.320 s]
-[INFO] mykid-db-adapter ................................... SUCCESS [  4.024 s]
-[INFO] mykid-domain ....................................... SUCCESS [  0.333 s]
-[INFO] mykid-rest-adapter ................................. SUCCESS [  7.735 s]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  23.806 s
-[INFO] Finished at: 2021-03-26T13:27:46+01:00
-[INFO] ------------------------------------------------------------------------
 ```
 
-Create a docker image and use the docker-compose.yml  or
-Use the docker-compose-development.yml which starts nginx & mysql and use the editor to start the app. Refer to `spring-boot-server/README.md` for additional database configs if needed.
+Go to root repository folder
+```bash
+$> docker build . -t mykid-service:0.0.1
+
+$> docker images
+REPOSITORY        TAG                      IMAGE ID       CREATED         SIZE
+mykid-service     0.0.1                    064000d92bae   4 seconds ago   534MB
+
+$> docker-compose up
+```
+
+
 
 
 ### run 
-  java -Dspring.profiles.active=local -jar mykid-rest-adapter/target/mykid-rest-adapter-0.0.1-SNAPSHOT.jar
+```bash
+
+$> cd 
+
+```
