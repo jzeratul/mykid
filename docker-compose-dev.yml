@@ -7,27 +7,21 @@ services:
     image: mysql/mysql-server:latest
     container_name: mykid-mysql
     ports:
-      - "3310:3306"
+      - "3306:3306"
     restart: always
     environment:
       MYSQL_DATABASE: mykiddb
       MYSQL_USER: root
       MYSQL_PASSWORD: mykid
       MYSQL_ROOT_PASSWORD: mykid
-      MYSQL_TCP_PORT: 3310
-    networks:
-      - mykid
+      MYSQL_TCP_PORT: 3306
 
   nginx:
     image: nginx:latest
     container_name: mykid-nginx
     volumes:
-      - ./nginx/nginx-server-dev.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx-dev.conf:/etc/nginx/nginx.conf
       - ./logs:/var/logs/nginx
-      - ./react-client/build:/www-nginx/mykid
     ports:
       - 80:80
       - 443:443
-
-networks:
-  mykid:

@@ -58,7 +58,6 @@
 
     <plugins>
 
-
       <plugin>
         <groupId>com.github.ulisesbocchio</groupId>
         <artifactId>jasypt-maven-plugin</artifactId>

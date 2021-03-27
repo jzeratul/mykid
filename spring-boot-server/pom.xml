@@ -113,11 +113,6 @@
         <artifactId>springfox-swagger2</artifactId>
         <version>${springfox-swagger2.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.springframework.data</groupId>
-        <artifactId>spring-data-commons-core</artifactId>
-        <version>${spring-data-commons-core.version}</version>
-      </dependency>
       <!--  END libs are required because in the generated API-->
 
     </dependencies>
