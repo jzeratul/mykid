@@ -1,0 +1,38 @@
+server:
+  port: 2021
+
+spring:
+  application:
+    name: mykid-service
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    generate-ddl: false
+    database: mysql
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/mykiddb?serverTimezone=UTC&useLegacyDatetimeCode=false
+    username: root
+    password: mykid
+    hikari:
+      maximum-pool-size: 3
+
+jasypt:
+  encryptor:
+    password: mykid_key
+
+jwt:
+  secret: mykid_jwt_secret
+
+
+springdoc:
+  api-docs:
+    path: /mykid/docs.json
+
+logging:
+  level:
+    root: DEBUG

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>spring-boot-server</artifactId>
+    <groupId>org.jzeratul.mykid</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>mykid-rest-adapter</artifactId>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.jzeratul.mykid</groupId>
+      <artifactId>mykid-domain</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-ui</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.ulisesbocchio</groupId>
+      <artifactId>jasypt-spring-boot-starter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.swagger.parser.v3</groupId>
+      <artifactId>swagger-parser</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.openapitools</groupId>
+      <artifactId>jackson-databind-nullable</artifactId>
+    </dependency>
+
+    <!--  Start libs are required because in the generated API-->
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+    </dependency>
+    <!--  END libs are required because in the generated API-->
+  </dependencies>
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <groupId>com.github.ulisesbocchio</groupId>
+        <artifactId>jasypt-maven-plugin</artifactId>
+      </plugin>
+
+      <!--  sanity check on the contracts  -->
+      <plugin>
+        <groupId>it.traeck.tools.openapi</groupId>
+        <artifactId>openapi-validator-maven-plugin</artifactId>
+        <version>${openapi-validator-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
+              <outputPath>${project.build.directory}/classes</outputPath>
+              <outputFilename>openapi</outputFilename>
+              <outputFormat>YAML</outputFormat>
+              <prettyPrint>true</prettyPrint>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Generating the documentation of the contracts -->
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>${openapi-generator-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
+
+              <generatorName>spring</generatorName>
+              <library>spring-boot</library>
+
+              <apiPackage>org.jzeratul.mykid.api</apiPackage>
+              <modelPackage>org.jzeratul.mykid.model</modelPackage>
+
+              <configOptions>
+                <delegatePattern>false</delegatePattern>
+                <dateLibrary>java8</dateLibrary>
+                <bigDecimalAsString>true</bigDecimalAsString>
+                <booleanGetterPrefix>is</booleanGetterPrefix>
+                <serializableModel>true</serializableModel>
+                <useOptional>true</useOptional>
+                <useTags>true</useTags>
+                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <interfaceOnly>true</interfaceOnly>
+                <swaggerDocketConfig>false</swaggerDocketConfig>
+                <title>jmoney</title>
+
+                <licenseName>MIT</licenseName>
+                <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>

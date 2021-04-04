@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.5.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.jzeratul.mykid</groupId>
+  <artifactId>spring-boot-server</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>My Kid</name>
+  <description>Various stats of my growing baby</description>
+
+  <properties>
+    <java.version>16</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <spring-cloud.version>2020.0.3-SNAPSHOT</spring-cloud.version>
+    <springdoc-openapi.version>1.5.6</springdoc-openapi.version>
+    <openapi-generator-maven-plugin.version>5.1.0</openapi-generator-maven-plugin.version>
+    <openapi-validator-maven-plugin.version>1.0.2</openapi-validator-maven-plugin.version>
+
+    <swagger-parser.version>2.0.24</swagger-parser.version>
+    <jackson.version>2.12.2</jackson.version>
+    <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
+
+    <!--  Start libs are required because in the genereated API-->
+    <springfox-swagger-ui.version>3.0.0</springfox-swagger-ui.version>
+    <springfox-swagger2.version>3.0.0</springfox-swagger2.version>
+    <!--  END libs are required because in the genereated API-->
+
+    <jasypt-spring-boot-starter.version>3.0.3</jasypt-spring-boot-starter.version>
+    <jasypt-maven-plugin.version>3.0.3</jasypt-maven-plugin.version>
+    <jsonwebtoken.version>0.9.1</jsonwebtoken.version>
+  </properties>
+
+  <modules>
+
+    <module>mykid-domain</module>
+    <module>mykid-db-adapter</module>
+    <module>mykid-rest-adapter</module>
+    <module>mykid-application</module>
+
+  </modules>
+
+  <dependencies>
+
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+
+
+      <dependency>
+        <groupId>org.jzeratul.mykid</groupId>
+        <artifactId>mykid-domain</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+
+      <dependency>
+        <groupId>com.github.ulisesbocchio</groupId>
+        <artifactId>jasypt-spring-boot-starter</artifactId>
+        <version>${jasypt-spring-boot-starter.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt</artifactId>
+        <version>${jsonwebtoken.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-ui</artifactId>
+        <version>${springdoc-openapi.version}</version>
+      </dependency>
+
+      <!--  Required by the open api generator -->
+      <dependency>
+        <groupId>io.swagger.parser.v3</groupId>
+        <artifactId>swagger-parser</artifactId>
+        <version>${swagger-parser.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.openapitools</groupId>
+        <artifactId>jackson-databind-nullable</artifactId>
+        <version>${jackson-databind-nullable-version}</version>
+      </dependency>
+      <!--  End Required by the open api generator -->
+
+      <!--  Start libs are required because in the generated API-->
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger-ui</artifactId>
+        <version>${springfox-swagger-ui.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger2</artifactId>
+        <version>${springfox-swagger2.version}</version>
+      </dependency>
+      <!--  END libs are required because in the generated API-->
+
+    </dependencies>
+
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+
+        <plugin>
+          <groupId>com.github.ulisesbocchio</groupId>
+          <artifactId>jasypt-maven-plugin</artifactId>
+          <version>${jasypt-maven-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+
+  <repositories>
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+    </repository>
+    <repository>
+      <id>spring-snapshots</id>
+      <name>Spring Snapshots</name>
+      <url>https://repo.spring.io/snapshot</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>spring-snapshots</id>
+      <name>Spring Snapshots</name>
+      <url>https://repo.spring.io/snapshot</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+</project>
