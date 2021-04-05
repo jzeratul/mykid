@@ -1,26 +1,25 @@
 package org.jzeratul.mykid.security;
 
+import java.util.Collections;
+
 import org.jzeratul.mykid.StatsService;
 import org.jzeratul.mykid.model.User;
 import org.jzeratul.mykid.model.UserRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Service
 public class AppUserService implements UserDetailsService {
 
-  private static final Logger log = LoggerFactory.getLogger(AppUserService.class);
-
   private final StatsService statsService;
+  private final PasswordEncoder bCryptPasswordEncoder;
 
-  public AppUserService(StatsService statsService) {
+  public AppUserService(StatsService statsService, PasswordEncoder bCryptPasswordEncoder) {
     this.statsService = statsService;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
   }
 
   @Override
@@ -29,7 +28,7 @@ public class AppUserService implements UserDetailsService {
     final UserRecord user = statsService.findByUsername(username);
 
     if (user != null) {
-      return new AppUser(user.id(), user.username(), "", Collections.emptyList());
+      return new AppUser(user.id(), user.username(), user.password(), Collections.emptyList());
 
     } else {
       throw new UsernameNotFoundException("user not found");
@@ -40,9 +39,8 @@ public class AppUserService implements UserDetailsService {
 
     var user = statsService.findByUsername(newUser.getUsername());
 
-    if (user == null) {
-      log.info("Attempted signup with existing username {}.", newUser.getUsername());
-      return null;
+    if (user != null) {
+      throw new RuntimeException("Attempted signup with existing username " + newUser.getUsername());
     }
 
     statsService.storeUser(mapToRecord(newUser));
@@ -52,9 +50,7 @@ public class AppUserService implements UserDetailsService {
 
   private UserRecord mapToRecord(User newUser) {
 
-    // todo encrypt pwd
-    // todo shall we encrypt the username too?
-    String pwd = newUser.getPassword();
+    String pwd = bCryptPasswordEncoder.encode(newUser.getPassword());
 
     return new UserRecord(null, newUser.getUsername(), pwd, newUser.getCreatedAt());
   }

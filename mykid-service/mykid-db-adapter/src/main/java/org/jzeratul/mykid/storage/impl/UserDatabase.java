@@ -4,6 +4,8 @@ import org.jzeratul.mykid.DbKidUser;
 import org.jzeratul.mykid.DbKidUserRepository;
 import org.jzeratul.mykid.model.UserRecord;
 import org.jzeratul.mykid.storage.UserDataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -11,6 +13,8 @@ import java.util.Optional;
 @Component
 public class UserDatabase implements UserDataStore {
 
+  private static final Logger log = LoggerFactory.getLogger(UserDatabase.class);
+  
   private final DbKidUserRepository repository;
 
   public UserDatabase(DbKidUserRepository repository) {
@@ -19,7 +23,9 @@ public class UserDatabase implements UserDataStore {
 
   @Override
   public void store(UserRecord record) {
-    repository.save(mapToDatabaseEntity(record));
+  	log.debug("storing {}", record);
+    DbKidUser save = repository.save(mapToDatabaseEntity(record));
+    log.debug("stored user {} id {}", save.username(), save.id());
   }
 
   @Override

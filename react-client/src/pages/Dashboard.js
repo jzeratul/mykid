@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Button, InputGroup, Table, Tab, FormControl, Container, Form, Row, Card } from "react-bootstrap"
+import { Button, InputGroup, Table, Tab, FormControl, Container, Form, Row, Card, Navbar, Image, Nav } from "react-bootstrap"
 import Tabs from 'react-bootstrap/Tabs'
-import axios from "axios"
 import { IconArrowBarLeft, IconArrowBarRight, IconCapture, IconClock, IconEraser, IconGlassFull, IconMask, IconMoodKid } from '@tabler/icons'
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
@@ -9,6 +8,9 @@ import TRANSLATIONS from "./translations"
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, BarChart, Bar
 } from 'recharts';
+import DataService from '../services/DataService'
+import AppLogo from "../images/logo.svg"
+import AuthService from "../services/AuthService"
 
 
 const GENERIC_ACTIVITIES = ["BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "SPIT", "URINE", "POOP", "VITAMIN_D", "VITAMIN_K", "TEMPERATURE", "PUMP", "WEIGHT"]
@@ -16,9 +18,7 @@ const TEMPERATURES = [37.6, 37.5, 37.4, 37.3, 37.2, 37.1, 37, 36.9, 36.8, 36.7, 
 const FOOD_DURATION = [5, 10, 15, 20, 25, 30]
 const FOOD_QUANTITIES = [5, 10, 15, 20, 25, 30]
 
-const API_URL = '/mykid/api/v1/stats';
-
-function App() {
+const App = (props) => {
 
   const empty_record = {
     datetime: new Date(),
@@ -182,7 +182,7 @@ function App() {
 
     newRecord.createdAt = new Date()
 
-    axios.post(`${API_URL}`, newRecord).then(
+    DataService.saveStat(newRecord).then(
       () => {
         setNewRecord({ ...empty_record })
       },
@@ -195,6 +195,11 @@ function App() {
           error.toString();
 
         console.log(resMessage)
+        if (403 === error.response.data.status) {
+          AuthService.logout()
+          props.history.push("/mykid/login")
+          window.location.reload()
+        }
       }
     );
   }
@@ -237,7 +242,7 @@ function App() {
 
     if (eventKey === "stats") {
 
-      axios.get(`${API_URL}`).then(
+      DataService.getStats().then(
         (response) => {
           setRecords(filter(response.data.stats));
         },
@@ -247,7 +252,7 @@ function App() {
       )
     } else if (eventKey === "graphs") {
 
-      axios.get(`${API_URL}`).then(
+      DataService.getStats().then(
         (response) => {
           setRecords(response.data.stats)
           setGraph1Data(response.data.stats)
@@ -256,6 +261,11 @@ function App() {
         },
         (error) => {
           console.log(error)
+          if (403 === error.response.data.status) {
+            AuthService.logout()
+            props.history.push("/mykid/login")
+            window.location.reload()
+          }
         })
     }
   }
@@ -337,8 +347,37 @@ function App() {
     console.log(data)
   }
 
+  const logout = () => {
+    AuthService.logout()
+    props.history.push("/mykid/login")
+    window.location.reload()
+  }
+
   return (
     <main>
+
+
+      <Navbar bg="dark" expand="lg" variant="dark">
+        <Image src={AppLogo} width={20} height={20} rounded fluid className="mr-3" />
+        <Navbar.Brand>MyKid</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="mr-auto">
+
+          </Nav>
+          <Nav className="justify-content-end">
+
+            <Nav.Item>
+              <Nav.Link onClick={logout}>
+                logout
+              </Nav.Link>
+            </Nav.Item>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+
+
+
 
       <Container className="mt-4 mb-4">
         <Tabs defaultActiveKey="home" transition={false} id="noanim-tab-example" onSelect={statsTabSelected}>

@@ -35,4 +35,5 @@ springdoc:
 
 logging:
   level:
-    root: DEBUG
+    root: info
+    org.jzeratul.mykid: debug
