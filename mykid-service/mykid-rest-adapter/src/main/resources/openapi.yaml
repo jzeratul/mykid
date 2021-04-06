@@ -125,7 +125,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Stats'
-
+        dailyTotals:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyTotals'
+            
+    DailyTotals:
+      type: object
+      properties:
+        date:
+          type: string
+        dailyFeedCount:
+          type: number
+          format: double
+        weight:
+          type: number
+          format: double
+        dailyFeedTime:
+          type: number
+          format: double
+    
     Stats:
       type: object
       required:
@@ -165,6 +184,9 @@ components:
         createdAt:
           type: string
           format: date-time
+        daycount:
+          type: number
+          format: double
 
     GenericActivities:
       type: string
@@ -189,6 +211,8 @@ components:
         username:
           type: string
         password:
+          type: string
+        email:
           type: string
         createdAt:
           type: string

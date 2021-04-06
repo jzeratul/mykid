@@ -1,14 +1,15 @@
 package org.jzeratul.mykid;
 
+import java.time.OffsetDateTime;
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import org.jzeratul.mykid.api.MyKidApi;
 import org.jzeratul.mykid.model.GetStatsResponse;
 import org.jzeratul.mykid.model.Stats;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.time.OffsetDateTime;
-import java.util.Optional;
 
 @RestController
 public class StatsEndpoints implements MyKidApi {
@@ -35,10 +36,9 @@ public class StatsEndpoints implements MyKidApi {
 
     var stats = statsService.getStats(start, end);
 
-    var resp = new GetStatsResponse().stats(stats);
-
-    return ResponseEntity.ok(resp);
+    return ResponseEntity.ok(stats);
   }
+  
 
   @Override
   public ResponseEntity<Void> postStat(@Valid Stats stats) {

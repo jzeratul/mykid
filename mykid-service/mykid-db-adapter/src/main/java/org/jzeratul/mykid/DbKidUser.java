@@ -59,11 +59,11 @@ public class DbKidUser {
     return this;
   }
 
-  public String getEmail() {
+  public String email() {
     return email;
   }
 
-  public DbKidUser setEmail(String email) {
+  public DbKidUser email(String email) {
     this.email = email;
     return this;
   }

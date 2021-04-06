@@ -39,6 +39,7 @@ public class UserDatabase implements UserDataStore {
             .id(record.id())
             .createdAt(record.createdAt())
             .username(record.username())
+            .email(record.email())
             .password(record.password());
   }
 
@@ -52,6 +53,7 @@ public class UserDatabase implements UserDataStore {
             dbrecord.id(),
             dbrecord.username(),
             dbrecord.password(),
+            dbrecord.email(),
             dbrecord.createdAt()
     );
   }

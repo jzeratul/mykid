@@ -28,7 +28,7 @@ public class AppUserService implements UserDetailsService {
     final UserRecord user = statsService.findByUsername(username);
 
     if (user != null) {
-      return new AppUser(user.id(), user.username(), user.password(), Collections.emptyList());
+      return new AppUser(user.id(), user.username(), user.password(), user.email(), Collections.emptyList());
 
     } else {
       throw new UsernameNotFoundException("user not found");
@@ -52,6 +52,6 @@ public class AppUserService implements UserDetailsService {
 
     String pwd = bCryptPasswordEncoder.encode(newUser.getPassword());
 
-    return new UserRecord(null, newUser.getUsername(), pwd, newUser.getCreatedAt());
+    return new UserRecord(null, newUser.getUsername(), pwd, newUser.getEmail(), newUser.getCreatedAt());
   }
 }

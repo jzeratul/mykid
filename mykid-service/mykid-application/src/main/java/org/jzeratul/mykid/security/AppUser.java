@@ -10,9 +10,11 @@ import java.util.Collection;
  */
 public class AppUser extends User {
 	
+	private static final long serialVersionUID = -2150411866275142569L;
 	private Long userId;
+	private String email;
 	
-	public AppUser(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+	public AppUser(Long id, String username, String password, String email, Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
 		
 		this.userId = id;
@@ -20,5 +22,9 @@ public class AppUser extends User {
 
   public Long userId() {
     return userId;
+  }
+  
+  public String email() {
+  	return email;
   }
 }

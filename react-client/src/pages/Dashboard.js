@@ -12,7 +12,6 @@ import DataService from '../services/DataService'
 import AppLogo from "../images/logo.svg"
 import AuthService from "../services/AuthService"
 
-
 const GENERIC_ACTIVITIES = ["BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "SPIT", "URINE", "POOP", "VITAMIN_D", "VITAMIN_K", "TEMPERATURE", "PUMP", "WEIGHT"]
 const TEMPERATURES = [37.6, 37.5, 37.4, 37.3, 37.2, 37.1, 37, 36.9, 36.8, 36.7, 36.6, 36.5, 36.4]
 const FOOD_DURATION = [5, 10, 15, 20, 25, 30]
@@ -36,6 +35,7 @@ const App = (props) => {
   const [newRecord, setNewRecord] = useState({ ...empty_record })
 
   const [records, setRecords] = useState([])
+  const [totals, setTotals] = useState([])
   const [graph1, setGraph1] = useState([])
   const [graph2, setGraph2] = useState([])
   const [graph3, setGraph3] = useState([])
@@ -258,6 +258,7 @@ const App = (props) => {
           setGraph1Data(response.data.stats)
           setGraph2Data(response.data.stats)
           setGraph3Data(response.data.stats)
+          setTotals(response.data.dailyTotals)
         },
         (error) => {
           console.log(error)
@@ -268,15 +269,6 @@ const App = (props) => {
           }
         })
     }
-  }
-
-  const formatDate = (date) => {
-
-    let day = ('0' + date.getDate()).slice(-2);
-    let month = ('0' + (date.getMonth() + 1)).slice(-2);
-    let year = date.getFullYear();
-
-    return `${day}-${month}-${year}`
   }
 
   const formatDateTime = (date) => {
@@ -356,7 +348,6 @@ const App = (props) => {
   return (
     <main>
 
-
       <Navbar bg="dark" expand="lg" variant="dark">
         <Image src={AppLogo} width={20} height={20} rounded fluid className="mr-3" />
         <Navbar.Brand>MyKid</Navbar.Brand>
@@ -375,9 +366,6 @@ const App = (props) => {
           </Nav>
         </Navbar.Collapse>
       </Navbar>
-
-
-
 
       <Container className="mt-4 mb-4">
         <Tabs defaultActiveKey="home" transition={false} id="noanim-tab-example" onSelect={statsTabSelected}>
@@ -682,6 +670,7 @@ const App = (props) => {
             <Table striped bordered hover>
               <thead>
                 <tr>
+                  <th>#</th>
                   <th>Time</th>
                   <th>Eaten Time</th>
                   <th>Extra qty</th>
@@ -692,15 +681,16 @@ const App = (props) => {
 
                 {records.map(function (r, idx) {
                   return (
-                    <tr key={idx} >
+                    <tr key={idx}>
+                      <td>{r.daycount}</td>
                       <td>{r.datetime}</td>
                       <td><p> {calculateTotalEatenTime(r)}</p>
-                        {r.pumpFromLeftQuantity > 0 && <div><small>Pump Left {r.pumpFromLeftQuantity}mL</small></div>}
-                        {r.pumpFromRightQuantity > 0 && <div><small>Pump Right {r.pumpFromRightQuantity}mL</small></div>}
                         {r.feedFromLeftDuration > 0 && <div><small>Feed Left {r.feedFromLeftDuration} min</small></div>}
                         {r.feedFromRightDuration > 0 && <div><small>Feed Right {r.feedFromRightDuration} min</small></div>}
                       </td>
-                      <td>{calculateTotalEatenQty(r)}</td>
+                      <td><p>{calculateTotalEatenQty(r)}</p>
+                        {r.pumpFromLeftQuantity > 0 && <div><small>Pump Left {r.pumpFromLeftQuantity}mL</small></div>}
+                        {r.pumpFromRightQuantity > 0 && <div><small>Pump Right {r.pumpFromRightQuantity}mL</small></div>}</td>
                       <td>{r.weight}</td>
                     </tr>
                   )
@@ -712,13 +702,15 @@ const App = (props) => {
 
             <div className="mt-5" style={{ width: '100%' }}>
               <ResponsiveContainer width="100%" minWidth={500} minHeight={400}>
-                <LineChart width={500} height={400} data={graph1} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
+                <LineChart width={500} height={400} data={totals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="datetime" />
+                  <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line connectNulls type="monotone" dataKey="weight" stroke="#8884d8" fill="#8884d8" />
+                  <Line connectNulls type="monotone" dataKey="weight" stroke="#FF0000" fill="#FF0000" />
+                  <Line connectNulls type="monotone" dataKey="dailyFeedCount" stroke="#00FF00" fill="#00FF00" />
+                  <Line connectNulls type="monotone" dataKey="dailyFeedTime" stroke="#0000FF" fill="#0000FF" />
                 </LineChart>
               </ResponsiveContainer>
 
