@@ -9,7 +9,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
       AuthService.isLoggedIn() ? (
         <Component {...props} />
       ) : (
-        <Redirect to="/mykid" />
+        <Redirect to="/" />
       )
     }
   />

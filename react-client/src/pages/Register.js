@@ -134,9 +134,9 @@ const Register = (props) => {
 
                 <Container>
                   <Row>
-                    <Col><Link to={"/mykid/login"}> Login </Link></Col>
-                    <Col><Link to={"/mykid/dashboard/testme"}>Test me </Link></Col>
-                    <Col><Link to={"/mykid"}>Back </Link></Col>
+                    <Col><Link to={"/login"}> Login </Link></Col>
+                    <Col><Link to={"/dashboard/testme"}>Test me </Link></Col>
+                    <Col><Link to={"/"}>Back </Link></Col>
                   </Row>
                 </Container>
 

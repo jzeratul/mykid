@@ -19,10 +19,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class StatsService {
 
+  private final CurrentUserService userService;
 	private final StatsDataStore statsStore;
 	private final UserDataStore userStore;
 
-	public StatsService(StatsDataStore statsStore, UserDataStore userStore) {
+	public StatsService(StatsDataStore statsStore, UserDataStore userStore, CurrentUserService userService) {
+		this.userService = userService;
 		this.statsStore = statsStore;
 		this.userStore = userStore;
 	}
@@ -33,7 +35,7 @@ public class StatsService {
 
 	public GetStatsResponse getStats(OffsetDateTime start, OffsetDateTime end) {
 
-		Map<String, List<KidStatsRecord>> dailySortedStats = statsStore.getStats(start, end)
+		Map<String, List<KidStatsRecord>> dailySortedStats = statsStore.getStats(start, end, userService.getCurrentUserId())
 				.stream()
 				.sorted((r1, r2) -> {
 					return r2.datetime().compareTo(r1.datetime());	
@@ -117,7 +119,8 @@ public class StatsService {
 
 	private KidStatsRecord mapFromStats(Stats s) {
 		return new KidStatsRecord(
-				null, 
+				null,
+				userService.getCurrentUserId(),
 				OffsetDateTime.parse(s.getDatetime()),
 		    s.getActivities().stream().map(GenericActivities::getValue).collect(Collectors.toList()), 
 		    s.getTemperature(), 
@@ -145,5 +148,5 @@ public class StatsService {
 		    .extraBottleFormulaeMilkQuantity(r.extraBottleFormulaeMilkQuantity())
 		    .temperature(r.temperature())
 		    .weight(r.weight());
-	}
+	}  
 }

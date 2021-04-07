@@ -14,6 +14,9 @@ public class DbKidStats {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(name = "USR_ID")
+  private Long userid;
+  
   @Column(name = "DATETIME")
   private OffsetDateTime datetime;
 
@@ -45,6 +48,15 @@ public class DbKidStats {
   public DbKidStats id(Long id) {
     this.id = id;
     return this;
+  }
+  
+  public Long userid() {
+  	return userid;
+  }
+  
+  public DbKidStats userid(Long userid) {
+  	this.userid = userid;
+  	return this;
   }
 
   public OffsetDateTime datetime() {

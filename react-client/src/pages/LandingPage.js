@@ -16,7 +16,7 @@ const LandingPage = () => {
 
                 <Image src={AppLogo} rounded fluid className="mb-3" width={50} height={50} />
                 <Container>
-                  <Link to={"/mykid/login"}>
+                  <Link to={"/login"}>
                     <IconLogin
                       size={36}
                       color="red"
@@ -26,7 +26,7 @@ const LandingPage = () => {
                   Login </Link>
                 </Container>
                 <Container>
-                  <Link to={"/mykid/register"}><IconAtom
+                  <Link to={"/register"}><IconAtom
                     size={36}
                     color="blue"
                     stroke={3}
@@ -34,7 +34,7 @@ const LandingPage = () => {
                   /> Register Account </Link>
                 </Container>
                 <Container>
-                  <Link to={"/mykid/dashboard/testme"}>
+                  <Link to={"/dashboard/testme"}>
                     <IconAtom2
                       size={36}
                       color="green"

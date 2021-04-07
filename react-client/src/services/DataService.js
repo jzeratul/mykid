@@ -1,7 +1,7 @@
 import axios from "axios";
 import authHeader from './AuthHeader'
 
-const API_URL = '/mykid/api/v1/stats';
+const API_URL = '/api/v1/stats';
 
 const saveStat = (stat) => {
   return axios.post(`${API_URL}`, stat, { headers: authHeader() })

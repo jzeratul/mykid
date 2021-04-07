@@ -5,6 +5,7 @@ import java.util.List;
 
 public record KidStatsRecord(
         Long id,
+        Long userid,
         OffsetDateTime datetime,
         List<String> activities,
         Double temperature,

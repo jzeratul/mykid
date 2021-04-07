@@ -197,7 +197,7 @@ const App = (props) => {
         console.log(resMessage)
         if (403 === error.response.data.status) {
           AuthService.logout()
-          props.history.push("/mykid/login")
+          props.history.push("/login")
           window.location.reload()
         }
       }
@@ -264,7 +264,7 @@ const App = (props) => {
           console.log(error)
           if (403 === error.response.data.status) {
             AuthService.logout()
-            props.history.push("/mykid/login")
+            props.history.push("/login")
             window.location.reload()
           }
         })
@@ -341,7 +341,7 @@ const App = (props) => {
 
   const logout = () => {
     AuthService.logout()
-    props.history.push("/mykid/login")
+    props.history.push("/login")
     window.location.reload()
   }
 

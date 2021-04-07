@@ -9,5 +9,5 @@ public interface StatsDataStore {
 
   void storeStats(KidStatsRecord record);
 
-  List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end);
+  List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end, long userid);
 }

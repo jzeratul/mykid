@@ -41,7 +41,7 @@ const Login = (props) => {
     } else {
       AuthService.login(username, password).then(
         () => {
-          props.history.push("/mykid/dashboard");
+          props.history.push("/dashboard");
           window.location.reload();
         },
         (error) => {
@@ -168,9 +168,9 @@ const Login = (props) => {
 
                 <Container>
                   <Row>
-                    <Col><Link to={"/mykid/register"}> Register Account </Link></Col>
-                    <Col><Link to={"/mykid/dashboard/testme"}>Test me </Link></Col>
-                    <Col><Link to={"/mykid"}>Back </Link></Col>
+                    <Col><Link to={"/register"}> Register Account </Link></Col>
+                    <Col><Link to={"/dashboard/testme"}>Test me </Link></Col>
+                    <Col><Link to={"/"}>Back </Link></Col>
                   </Row>
                 </Container>
 

@@ -1,16 +1,16 @@
 package org.jzeratul.mykid.storage.impl;
 
-import org.jzeratul.mykid.DbKidStats;
-import org.jzeratul.mykid.DbKidStatsRepository;
-import org.jzeratul.mykid.model.KidStatsRecord;
-import org.jzeratul.mykid.storage.StatsDataStore;
-import org.springframework.stereotype.Component;
-
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.jzeratul.mykid.DbKidStats;
+import org.jzeratul.mykid.DbKidStatsRepository;
+import org.jzeratul.mykid.model.KidStatsRecord;
+import org.jzeratul.mykid.storage.StatsDataStore;
+import org.springframework.stereotype.Component;
 
 @Component
 public class StatsDatabase implements StatsDataStore {
@@ -27,8 +27,8 @@ public class StatsDatabase implements StatsDataStore {
   }
 
   @Override
-  public List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end) {
-    return statsRepository.findByCreatedAtBetween(start, end)
+  public List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end, long userid) {
+    return statsRepository.findByUseridAndCreatedAtBetween(userid, start, end)
             .map(
                     list -> list.stream()
                             .map(this::mapToDomain)
@@ -57,6 +57,7 @@ public class StatsDatabase implements StatsDataStore {
 
     return new KidStatsRecord(
             stats.id(),
+            stats.userid(),
             stats.datetime(),
             stats.activities() != null ? Stream.of(stats.activities().split(",")).toList() : null,
             stats.temperature(),

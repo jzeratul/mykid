@@ -11,7 +11,7 @@ var _AuthHeader = _interopRequireDefault(require("./AuthHeader"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var API_URL = '/mykid/api/v1/stats';
+var API_URL = '/api/v1/stats';
 
 var saveStat = function saveStat(stat) {
   return _axios["default"].post("".concat(API_URL), stat, {
