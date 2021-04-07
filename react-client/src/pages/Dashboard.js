@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { Button, InputGroup, Table, Tab, FormControl, Container, Form, Row, Card, Navbar, Image, Nav } from "react-bootstrap"
 import Tabs from 'react-bootstrap/Tabs'
 import { IconArrowBarLeft, IconArrowBarRight, IconCapture, IconClock, IconEraser, IconGlassFull, IconMask, IconMoodKid } from '@tabler/icons'
@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import TRANSLATIONS from "./translations"
 import {
-  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, BarChart, Bar
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend
 } from 'recharts';
 import DataService from '../services/DataService'
 import AppLogo from "../images/logo.svg"
@@ -35,9 +35,7 @@ const App = (props) => {
   const [newRecord, setNewRecord] = useState({ ...empty_record })
 
   const [records, setRecords] = useState([])
-  const [totals, setTotals] = useState([])
-  const [graph2, setGraph2] = useState([])
-  const [graph3, setGraph3] = useState([])
+  const [graphTotals, setGraphTotals] = useState([])
 
   const updateGenericActivity = (activity) => {
 
@@ -243,7 +241,7 @@ const App = (props) => {
 
       DataService.getStats().then(
         (response) => {
-          setRecords(filter(response.data.stats));
+          setRecords(response.data.stats);
         },
         (error) => {
           console.log(error)
@@ -254,9 +252,7 @@ const App = (props) => {
       DataService.getStats().then(
         (response) => {
           setRecords(response.data.stats)
-          setGraph2Data(response.data.stats)
-          setGraph3Data(response.data.stats)
-          setTotals(response.data.dailyTotals
+          setGraphTotals(response.data.dailyTotals
             .sort((s1, s2) => new Date(s1.date) - new Date(s2.date)))
         },
         (error) => {
@@ -268,55 +264,6 @@ const App = (props) => {
           }
         })
     }
-  }
-
-  const formatDateTime = (date) => {
-
-    let day = ('0' + date.getDate()).slice(-2)
-    let month = ('0' + (date.getMonth() + 1)).slice(-2)
-    let year = date.getFullYear()
-    let hours = ('0' + date.getHours()).slice(-2)
-    let minutes = ('0' + date.getMinutes()).slice(-2)
-    // let seconds = ('0' + date.getSeconds()).slice(-2)
-
-    return `${day}/${month}/${year} ${hours}:${minutes}`
-  }
-
-  const filter = (stats) => {
-    return stats
-      .sort((s1, s2) => new Date(s1.datetime) - new Date(s2.datetime))
-      .map(function (s, idx) {
-        s.datetime = formatDateTime(new Date(s.datetime))
-        return s
-      })
-  }
-
-  const setGraph2Data = (stats) => {
-
-    let data = stats
-      .sort((s1, s2) => new Date(s1.datetime) - new Date(s2.datetime))
-      .map(function (s, idx) {
-        return {
-          datetime: formatDateTime(new Date(s.datetime)),
-          FormulaBottle: s.extraBottleFormulaeMilkQuantity,
-          MotherBottle: s.extraBottleMotherMilkQuantity
-        }
-      })
-    setGraph2(data)
-  }
-
-  const setGraph3Data = (stats) => {
-
-    let data = stats
-      .sort((s1, s2) => new Date(s1.datetime) - new Date(s2.datetime))
-      .map(function (s, idx) {
-        return {
-          datetime: formatDateTime(new Date(s.datetime)),
-          LeftTime: s.feedFromLeftDuration,
-          RightTime: s.feedFromRightDuration
-        }
-      })
-    setGraph3(data)
   }
 
   const logout = () => {
@@ -682,7 +629,7 @@ const App = (props) => {
 
             <div className="mt-5" style={{ width: '100%' }}>
               <ResponsiveContainer width="100%" minWidth={500} minHeight={400}>
-                <LineChart width={500} height={400} data={totals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
+                <LineChart width={500} height={400} data={graphTotals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" label="date" />
                   <YAxis />
@@ -692,7 +639,7 @@ const App = (props) => {
                 </LineChart>
               </ResponsiveContainer>
               <ResponsiveContainer width="100%" minWidth={500} minHeight={400}>
-                <LineChart width={500} height={400} data={totals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
+                <LineChart width={500} height={400} data={graphTotals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" label="date" />
                   <YAxis />
@@ -702,7 +649,7 @@ const App = (props) => {
                 </LineChart>
               </ResponsiveContainer>
               <ResponsiveContainer width="100%" minWidth={500} minHeight={400}>
-                <LineChart width={500} height={400} data={totals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
+                <LineChart width={500} height={400} data={graphTotals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" label="date" />
                   <YAxis />
@@ -712,7 +659,7 @@ const App = (props) => {
                 </LineChart>
               </ResponsiveContainer>
               <ResponsiveContainer width="100%" minWidth={500} minHeight={400}>
-                <LineChart width={500} height={400} data={totals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
+                <LineChart width={500} height={400} data={graphTotals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="dailyFeedCount" label="dailyFeedCount" />
                   <YAxis />
@@ -722,7 +669,7 @@ const App = (props) => {
                 </LineChart>
               </ResponsiveContainer>
               <ResponsiveContainer width="100%" minWidth={500} minHeight={400}>
-                <LineChart width={500} height={400} data={totals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
+                <LineChart width={500} height={400} data={graphTotals} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="dailyFeedTime" label="dailyFeedTime" />
                   <YAxis />
@@ -730,32 +677,6 @@ const App = (props) => {
                   <Legend />
                   <Line connectNulls type="monotone" label="weight" dataKey="weight" stroke="#0000FF" fill="#0000FF" />
                 </LineChart>
-              </ResponsiveContainer>
-
-              <ResponsiveContainer width="100%" minWidth={500} minHeight={400} >
-                <BarChart width={500} height={400} data={graph2} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="datetime" label="datetime" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar connectNulls dataKey="FormulaBottle" label="FormulaBottle" fill="#8884d8" />
-                  <Bar connectNulls dataKey="MotherBottle" label="MotherBottle" fill="#880088" />
-                </BarChart>
-
-              </ResponsiveContainer>
-
-              <ResponsiveContainer width="100%" minWidth={500} minHeight={400} >
-                <BarChart width={500} height={400} data={graph3} margin={{ top: 5, right: 30, left: 20, bottom: 5 }} >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="datetime" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar connectNulls dataKey="LeftTime" label="LeftTime" fill="#FF84AA" />
-                  <Bar connectNulls dataKey="RightTime" label="RightTime" fill="#88FFCC" />
-                </BarChart>
-
               </ResponsiveContainer>
             </div>
 
