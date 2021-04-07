@@ -58,6 +58,13 @@
       <artifactId>springfox-swagger2</artifactId>
     </dependency>
     <!--  END libs are required because in the generated API-->
+   
+	<dependency>
+		<groupId>org.junit.jupiter</groupId>
+		<artifactId>junit-jupiter</artifactId>
+		<scope>test</scope>
+	</dependency>
+	
   </dependencies>
 
   <build>

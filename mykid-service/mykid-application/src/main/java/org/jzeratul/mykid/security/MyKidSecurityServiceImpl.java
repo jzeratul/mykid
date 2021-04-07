@@ -36,9 +36,7 @@ public class MyKidSecurityServiceImpl implements MyKidSecurityService {
 
     var token = jwtToken.generateToken(userDetails);
 
-    var loggedUser = new User().username(userDetails.getUsername()).jwtToken(token);
-
-    return loggedUser;
+    return new User().username(userDetails.getUsername()).jwtToken(token);
   }
 
   @Override

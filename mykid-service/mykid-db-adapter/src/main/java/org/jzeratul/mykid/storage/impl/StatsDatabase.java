@@ -28,7 +28,7 @@ public class StatsDatabase implements StatsDataStore {
 
   @Override
   public List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end, long userid) {
-    return statsRepository.findByUseridAndCreatedAtBetween(userid, start, end)
+    return statsRepository.findByUseridAndCreatedAtBetweenOrderByDatetimeDesc(userid, start, end)
             .map(
                     list -> list.stream()
                             .map(this::mapToDomain)

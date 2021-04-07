@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DbKidStatsRepository extends JpaRepository<DbKidStats, Long> {
 
-  Optional<List<DbKidStats>> findByUseridAndCreatedAtBetween(Long userid, OffsetDateTime start, OffsetDateTime end);
+  Optional<List<DbKidStats>> findByUseridAndCreatedAtBetweenOrderByDatetimeDesc(Long userid, OffsetDateTime start, OffsetDateTime end);
 }
