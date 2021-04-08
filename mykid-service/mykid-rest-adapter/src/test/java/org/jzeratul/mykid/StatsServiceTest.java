@@ -1,7 +1,5 @@
 package org.jzeratul.mykid;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -16,7 +14,10 @@ import org.jzeratul.mykid.model.GenericActivities;
 import org.jzeratul.mykid.model.GetStatsResponse;
 import org.jzeratul.mykid.model.KidStatsRecord;
 import org.jzeratul.mykid.model.Stats;
+import org.jzeratul.mykid.rest.StatsService;
 import org.jzeratul.mykid.storage.StatsDataStore;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StatsServiceTest {
 

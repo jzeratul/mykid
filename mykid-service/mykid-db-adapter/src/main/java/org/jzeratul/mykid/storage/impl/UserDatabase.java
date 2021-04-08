@@ -1,7 +1,7 @@
 package org.jzeratul.mykid.storage.impl;
 
-import org.jzeratul.mykid.DbKidUser;
-import org.jzeratul.mykid.DbKidUserRepository;
+import org.jzeratul.mykid.storage.DbKidUser;
+import org.jzeratul.mykid.storage.DbKidUserRepository;
 import org.jzeratul.mykid.model.UserRecord;
 import org.jzeratul.mykid.storage.UserDataStore;
 import org.slf4j.Logger;

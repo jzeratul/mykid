@@ -17,7 +17,7 @@ public class JwtTokenService implements Serializable {
 
 	private static final long serialVersionUID = 5885621847834577958L;
 
-	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+	public static final long JWT_TOKEN_VALIDITY = 2592000000L;
 
   @Value("jwt.secret")
   private String secret;
@@ -63,7 +63,7 @@ public class JwtTokenService implements Serializable {
             .setClaims(claims)
             .setSubject(subject)
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+            .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
             .signWith(SignatureAlgorithm.HS512, secret)
             .compact();
   }

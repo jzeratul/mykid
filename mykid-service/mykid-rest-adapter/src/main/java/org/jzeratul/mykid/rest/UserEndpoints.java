@@ -1,4 +1,4 @@
-package org.jzeratul.mykid;
+package org.jzeratul.mykid.rest;
 
 import org.jzeratul.mykid.api.UserApi;
 import org.jzeratul.mykid.model.User;

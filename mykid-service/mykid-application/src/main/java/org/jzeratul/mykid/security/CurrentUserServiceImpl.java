@@ -1,6 +1,6 @@
 package org.jzeratul.mykid.security;
 
-import org.jzeratul.mykid.CurrentUserService;
+import org.jzeratul.mykid.rest.CurrentUserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

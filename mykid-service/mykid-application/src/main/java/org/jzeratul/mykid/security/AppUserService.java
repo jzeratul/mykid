@@ -2,7 +2,7 @@ package org.jzeratul.mykid.security;
 
 import java.util.Collections;
 
-import org.jzeratul.mykid.StatsService;
+import org.jzeratul.mykid.rest.StatsService;
 import org.jzeratul.mykid.model.User;
 import org.jzeratul.mykid.model.UserRecord;
 import org.springframework.security.core.userdetails.UserDetails;

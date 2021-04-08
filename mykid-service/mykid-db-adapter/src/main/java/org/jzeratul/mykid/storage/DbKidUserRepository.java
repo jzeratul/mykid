@@ -1,4 +1,4 @@
-package org.jzeratul.mykid;
+package org.jzeratul.mykid.storage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

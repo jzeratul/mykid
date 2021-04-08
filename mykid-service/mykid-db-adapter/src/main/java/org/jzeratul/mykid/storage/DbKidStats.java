@@ -1,4 +1,4 @@
-package org.jzeratul.mykid;
+package org.jzeratul.mykid.storage;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

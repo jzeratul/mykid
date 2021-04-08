@@ -1,6 +1,6 @@
 package org.jzeratul.mykid.security;
 
-import org.jzeratul.mykid.MyKidSecurityService;
+import org.jzeratul.mykid.rest.MyKidSecurityService;
 import org.jzeratul.mykid.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

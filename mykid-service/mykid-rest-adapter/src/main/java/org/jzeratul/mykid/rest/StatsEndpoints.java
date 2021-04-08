@@ -1,4 +1,4 @@
-package org.jzeratul.mykid;
+package org.jzeratul.mykid.rest;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;

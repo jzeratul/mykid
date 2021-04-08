@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jzeratul.mykid.DbKidStats;
-import org.jzeratul.mykid.DbKidStatsRepository;
+import org.jzeratul.mykid.storage.DbKidStats;
+import org.jzeratul.mykid.storage.DbKidStatsRepository;
 import org.jzeratul.mykid.model.KidStatsRecord;
 import org.jzeratul.mykid.storage.StatsDataStore;
 import org.springframework.stereotype.Component;
