@@ -7,11 +7,16 @@ const saveStat = (stat) => {
   return axios.post(`${API_URL}`, stat, { headers: authHeader() })
 }
 
-const getStats = (stat) => {
+const getStats = () => {
   return axios.get(`${API_URL}`, { headers: authHeader() })
+}
+
+const deleteStat = (stat) => {
+  return axios.post(`${API_URL}/stat`, stat, { headers: authHeader() })
 }
 
 export default {
   saveStat,
-  getStats
+  getStats,
+  deleteStat
 }

@@ -1,7 +1,7 @@
 package org.jzeratul.mykid.rest;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,21 +15,30 @@ import org.jzeratul.mykid.model.Stats;
 import org.jzeratul.mykid.model.UserRecord;
 import org.jzeratul.mykid.storage.StatsDataStore;
 import org.jzeratul.mykid.storage.UserDataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class StatsService {
 
-  protected static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd-MMM-YYYY HH:mm");
+  private static final Logger log = LoggerFactory.getLogger(StatsService.class);
+//  private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd-MMM-YYYY HH:mm");
+  private static final ObjectMapper OM = new ObjectMapper();
 
   private final CurrentUserService userService;
   private final StatsDataStore statsStore;
   private final UserDataStore userStore;
+  private final EncryptorService encryptorService;
 
-  public StatsService(StatsDataStore statsStore, UserDataStore userStore, CurrentUserService userService) {
+  public StatsService(StatsDataStore statsStore, UserDataStore userStore, CurrentUserService userService, EncryptorService encryptorService) {
     this.userService = userService;
     this.statsStore = statsStore;
     this.userStore = userStore;
+    this.encryptorService = encryptorService;
   }
 
   public void storeStats(Stats stats) {
@@ -38,21 +47,16 @@ public class StatsService {
 
   public GetStatsResponse getStats(OffsetDateTime start, OffsetDateTime end) {
 
-    Map<String, List<KidStatsRecord>> dailySortedStats = statsStore.getStats(start, end, userService.getCurrentUserId())
+    Map<LocalDate, List<KidStatsRecord>> dailySortedStats = statsStore.getStats(start, end, userService.getCurrentUserId())
             .stream()
-            .collect(
-                    Collectors.groupingBy(
-                            s -> s.datetime().getYear() + "-" +
-                                    s.datetime().getMonthValue() + "-" +
-                                    s.datetime().getDayOfMonth())
-            );
+            .collect(Collectors.groupingBy(s -> s.datetime().toLocalDate()));
 
     var totals = new ArrayList<DailyTotals>();
 
     dailySortedStats.forEach((key, dailyStatsRecords) -> {
 
       DailyTotals dt = new DailyTotals();
-      dt.date(key);
+      dt.date(key.toString());
 
       dailyStatsRecords.forEach(r -> {
 
@@ -95,6 +99,30 @@ public class StatsService {
 
     totals.sort((t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
+    
+    if(log.isDebugEnabled()) {
+    	String log1 = stats.stream().map(s -> {
+				try {
+					return OM.writeValueAsString(s);
+				} catch (JsonProcessingException e) {
+					return e.getMessage();
+				}
+			}).collect(Collectors.joining("\n"));
+    	
+    	String log2 = totals.stream().map(s -> {
+				try {
+					return OM.writeValueAsString(s);
+				} catch (JsonProcessingException e) {
+					return e.getMessage();
+				}
+			}).collect(Collectors.joining("\n"));
+    	
+    	log.debug("\n =========================================================================\n"
+    			+ "StatsService \n stats:\n {} \n"
+    			+ " =========================================================================\n "
+    			+ "totals\n{}", log1, log2);
+    }
+    
     return new GetStatsResponse().stats(stats).dailyTotals(totals);
 
   }
@@ -107,11 +135,20 @@ public class StatsService {
     userStore.store(record);
   }
 
+  public void deleteStat(Stats stats) {
+    statsStore.delete(mapFromStats(stats));
+  }
+
   private KidStatsRecord mapFromStats(Stats s) {
+  	
+		log.debug("Saving dates: from request {} to offset {}", 
+				s.getDatetime());
+  	
+  	
     return new KidStatsRecord(
-            null,
+            s.getToken() == null ? null : encryptorService.decLong(s.getToken()),
             userService.getCurrentUserId(),
-            OffsetDateTime.parse(s.getDatetime()),
+            s.getDatetime(),
             s.getActivities().stream().map(GenericActivities::getValue).collect(Collectors.toList()),
             s.getTemperature(),
             s.getFeedFromLeftDuration(),
@@ -127,9 +164,10 @@ public class StatsService {
   private Stats mapFromRecord(KidStatsRecord r) {
 
     return new Stats()
+            .token(encryptorService.encLong(r.id()))
             .activities(
                     r.activities().stream().map(GenericActivities::fromValue).collect(Collectors.toList()))
-            .datetime(r.datetime().format(DF))
+            .datetime(r.datetime())
             .feedFromLeftDuration(r.feedFromLeftDuration())
             .feedFromRightDuration(r.feedFromRightDuration())
             .pumpFromLeftQuantity(r.pumpFromLeftQuantity())

@@ -1,5 +1,7 @@
 package org.jzeratul.mykid;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -14,10 +16,9 @@ import org.jzeratul.mykid.model.GenericActivities;
 import org.jzeratul.mykid.model.GetStatsResponse;
 import org.jzeratul.mykid.model.KidStatsRecord;
 import org.jzeratul.mykid.model.Stats;
+import org.jzeratul.mykid.rest.EncryptorService;
 import org.jzeratul.mykid.rest.StatsService;
 import org.jzeratul.mykid.storage.StatsDataStore;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StatsServiceTest {
 
@@ -32,9 +33,40 @@ public class StatsServiceTest {
 			return Arrays.asList(record(3, 20, 20, 1), record(3, 20, 19, 2), record(3, 20, 18, 3), record(3, 10, 20, 1), record(3, 10, 19, 2), record(2, 20, 20, 4),
 			    record(2, 15, 20, 5), record(2, 15, 19, 6), record(1, 14, 20, 7), record(1, 14, 19, 8));
 		}
-	};
 
-	private final StatsService service = new StatsService(fakeData, null, () -> 0);
+    @Override
+    public void delete(KidStatsRecord mapFromStats) {
+    }
+  };
+
+  private EncryptorService es = new EncryptorService() {
+
+		@Override
+		public Long decLong(String encrypted) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String encLong(Long id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String decStr(String encrypted) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String encStr(String decrypted) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+  };
+  
+	private final StatsService service = new StatsService(fakeData, null, () -> 0, es);
 
 	@Test
 	public void testOrder() {
@@ -66,11 +98,11 @@ public class StatsServiceTest {
 		 * 2021-1-14 dayFeedCount:4.0 dayFeedTime:4.0
 		 */
 
-		assertEquals("2021-3-20", dailyTotals.get(0).getDate());
-		assertEquals("2021-3-10", dailyTotals.get(1).getDate());
-		assertEquals("2021-2-20", dailyTotals.get(2).getDate());
-		assertEquals("2021-2-15", dailyTotals.get(3).getDate());
-		assertEquals("2021-1-14", dailyTotals.get(4).getDate());
+		assertEquals("2021-03-20", dailyTotals.get(0).getDate());
+		assertEquals("2021-03-10", dailyTotals.get(1).getDate());
+		assertEquals("2021-02-20", dailyTotals.get(2).getDate());
+		assertEquals("2021-02-15", dailyTotals.get(3).getDate());
+		assertEquals("2021-01-14", dailyTotals.get(4).getDate());
 
 		assertEquals(6d, dailyTotals.get(0).getDailyFeedCount());
 		assertEquals(4d, dailyTotals.get(1).getDailyFeedCount());

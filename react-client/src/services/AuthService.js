@@ -13,16 +13,17 @@ const login = (username, password) => {
       if (response.data.jwtToken) {
         localStorage.setItem("user", JSON.stringify(response.data));
       }
-
-      return response.data;
+      return response;
     });
 };
 
 const logout = () => {
+  console.log("logout")
   localStorage.removeItem("user");
 };
 
 const getCurrentUser = () => {
+  console.log("getCurrentUser: " + JSON.parse(localStorage.getItem("user")))
   return JSON.parse(localStorage.getItem("user"));
 };
 

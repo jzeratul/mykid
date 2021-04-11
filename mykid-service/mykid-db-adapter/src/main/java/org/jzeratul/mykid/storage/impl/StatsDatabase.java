@@ -6,14 +6,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jzeratul.mykid.model.KidStatsRecord;
 import org.jzeratul.mykid.storage.DbKidStats;
 import org.jzeratul.mykid.storage.DbKidStatsRepository;
-import org.jzeratul.mykid.model.KidStatsRecord;
 import org.jzeratul.mykid.storage.StatsDataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StatsDatabase implements StatsDataStore {
+	
+  private static final Logger log = LoggerFactory.getLogger(StatsDatabase.class);
 
   private final DbKidStatsRepository statsRepository;
 
@@ -28,18 +32,39 @@ public class StatsDatabase implements StatsDataStore {
 
   @Override
   public List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end, long userid) {
-    return statsRepository.findByUseridAndCreatedAtBetweenOrderByDatetimeDesc(userid, start, end)
+    List<KidStatsRecord> data = statsRepository.findByUseridAndCreatedAtBetweenOrderByDatetimeDesc(userid, start, end)
             .map(
                     list -> list.stream()
                             .map(this::mapToDomain)
                             .collect(Collectors.toList()))
             .orElse(Collections.emptyList());
+    
+
+    
+    if(log.isDebugEnabled()) {
+    	String log1 = data.stream().map(s -> 
+    	s.id() + "," + s.weight() + "," + s.datetime().toString() + ","
+		
+			).collect(Collectors.joining("\n"));
+    
+    	
+    	log.debug("\n =========================================================================\n"
+    			+ "StatsDatabase \n stats:\n {} \n", log1);
+    }
+    
+		return data;
+  }
+
+  @Override
+  public void delete(KidStatsRecord record) {
+    statsRepository.delete(mapToDatabaseEntity(record));
   }
 
   private DbKidStats mapToDatabaseEntity(KidStatsRecord record) {
 
     return new DbKidStats()
             .id(record.id())
+            .userid(record.userid())
             .activities(record.activities() != null ? String.join(",", record.activities()) : "")
             .createdAt(record.createdAt())
             .datetime(record.datetime())

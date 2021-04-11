@@ -21,6 +21,13 @@ public class StatsEndpoints implements MyKidApi {
   }
 
   @Override
+  public ResponseEntity<Void> deleteStat(Stats stats) {
+
+    statsService.deleteStat(stats);
+    return ResponseEntity.ok().build();
+  }
+
+  @Override
   public ResponseEntity<GetStatsResponse> getStats(Optional<String> startDate, Optional<String> endDate) {
 
     OffsetDateTime start;

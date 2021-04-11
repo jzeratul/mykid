@@ -68,6 +68,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /v1/stats/stat:
+    post:
+      operationId: deleteStat
+      tags:
+        - my-kid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Stats'
+      responses:
+        '200':
+          description: all the stats available in the given interval
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /v1/auth/signup:
     post:
@@ -151,8 +171,11 @@ components:
         - createdAt
         - datetime
       properties:
+        token:
+          type: string
         datetime:
           type: string
+          format: date-time
         activities:
           type: array
           items:

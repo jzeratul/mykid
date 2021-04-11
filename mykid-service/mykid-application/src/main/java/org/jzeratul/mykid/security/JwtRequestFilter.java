@@ -1,6 +1,14 @@
 package org.jzeratul.mykid.security;
 
-import io.jsonwebtoken.ExpiredJwtException;
+import java.io.IOException;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -10,11 +18,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -35,7 +39,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     final String requestTokenHeader = request.getHeader("Authorization");
 
-    log.debug("doFilter on JwtRequestFilter {}", request.getRequestURI());
+    log.debug("JwtRequestFilter {} {} {} {}", request.getRequestURI(), request.getContentType(), request.getMethod(), map(request.getParameterMap()));
 
     String username = null;
     String jwtToken = null;
@@ -74,4 +78,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
     chain.doFilter(request, response);
   }
+
+	private Object map(Map<String, String[]> parameterMap) {
+		String mapAsString = parameterMap.keySet().stream()
+	      .map(key -> key + "=" + parameterMap.get(key))
+	      .collect(Collectors.joining(", ", "{", "}"));
+	    return mapAsString;
+	}
 }
