@@ -66,8 +66,14 @@ $> docker-compose up
 ### deployment components
 ![](spring-boot-server/doc/dataflow.png)
 
+### thanks to
+Using the AdminLte template: https://github.com/ColorlibHQ/AdminLTE
 
 ### app screenshots
 ![](doc/Screenshot1.png)
 ![](doc/Screenshot2.png)
 ![](doc/Screenshot3.png)
+
+
+### license
+MIT

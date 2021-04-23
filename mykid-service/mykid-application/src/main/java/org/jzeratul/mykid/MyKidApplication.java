@@ -20,10 +20,9 @@ public class MyKidApplication {
   public static void main(String[] args) {
     SpringApplication.run(MyKidApplication.class, args);
   }
-  
 
   @Component
-  public class EndpointsListener implements ApplicationListener<ContextRefreshedEvent> {
+  public static final class EndpointsListener implements ApplicationListener<ContextRefreshedEvent> {
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {

@@ -3,14 +3,22 @@ package org.jzeratul.mykid.rest;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.jzeratul.mykid.model.DailyTotals;
 import org.jzeratul.mykid.model.GenericActivities;
+import org.jzeratul.mykid.model.GetSleepResponse;
 import org.jzeratul.mykid.model.GetStatsResponse;
 import org.jzeratul.mykid.model.KidStatsRecord;
+import org.jzeratul.mykid.model.Sleep;
+import org.jzeratul.mykid.model.SleepDailyTotal;
+import org.jzeratul.mykid.model.SleepRecord;
 import org.jzeratul.mykid.model.Stats;
 import org.jzeratul.mykid.model.UserRecord;
 import org.jzeratul.mykid.storage.StatsDataStore;
@@ -27,7 +35,6 @@ public class StatsService {
 
   private static final Logger log = LoggerFactory.getLogger(StatsService.class);
 //  private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd-MMM-YYYY HH:mm");
-  private static final ObjectMapper OM = new ObjectMapper();
 
   private final CurrentUserService userService;
   private final StatsDataStore statsStore;
@@ -42,46 +49,42 @@ public class StatsService {
   }
 
   public void storeStats(Stats stats) {
-    statsStore.storeStats(mapFromStats(stats));
+    statsStore.storeStats(mapToRecord(stats));
   }
 
   public GetStatsResponse getStats(OffsetDateTime start, OffsetDateTime end) {
 
     Map<LocalDate, List<KidStatsRecord>> dailySortedStats = statsStore.getStats(start, end, userService.getCurrentUserId())
             .stream()
-            .collect(Collectors.groupingBy(s -> s.datetime().toLocalDate()));
+            .collect(Collectors.groupingBy(s -> s.getDay()));
 
     var totals = new ArrayList<DailyTotals>();
+    double lastKnownWeight = 0;
 
-    dailySortedStats.forEach((key, dailyStatsRecords) -> {
+    for (Map.Entry<LocalDate, List<KidStatsRecord>> dailyTotals : dailySortedStats.entrySet()) {
+		
+    	 DailyTotals dt = new DailyTotals();
+       dt.date(dailyTotals.getKey().toString());
+       dt.setDailyFeedQuantity(0d);
+       dt.setDailyFeedTime(0d);
+       dt.setWeight(lastKnownWeight);
 
-      DailyTotals dt = new DailyTotals();
-      dt.date(key.toString());
+       for (KidStatsRecord r : dailyTotals.getValue()) {
+      	 dt.dailyFeedQuantity(dt.getDailyFeedQuantity() + r.totalFeedQuantity());
+         dt.dailyFeedTime(dt.getDailyFeedTime() + r.totalFeedDuration());
 
-      dailyStatsRecords.forEach(r -> {
-
-        dt.dailyFeedCount(
-                (dt.getDailyFeedCount() != null ? dt.getDailyFeedCount() : 0) +
-                        (r.extraBottleFormulaeMilkQuantity() != null ? r.extraBottleFormulaeMilkQuantity() : 0) +
-                        (r.extraBottleMotherMilkQuantity() != null ? r.extraBottleMotherMilkQuantity() : 0)
-        );
-
-        dt.dailyFeedTime(
-                (dt.getDailyFeedTime() != null ? dt.getDailyFeedTime() : 0) +
-                        (r.feedFromLeftDuration() != null ? r.feedFromLeftDuration() : 0) +
-                        (r.feedFromRightDuration() != null ? r.feedFromRightDuration() : 0)
-        );
-
-        if (dt.getWeight() == null && r.weight() != null) {
-          dt.setWeight(r.weight());
-        }
-      });
-      totals.add(dt);
-    });
-
+         if (r.weight() > 0) {
+           dt.setWeight(r.weight());
+           lastKnownWeight = r.weight();
+         } 
+       }
+       
+       totals.add(dt);
+		}
+    
     List<Stats> stats = dailySortedStats.keySet()
             .stream()
-            .sorted((k1, k2) -> k2.compareTo(k1))
+            .sorted(Comparator.reverseOrder())
             .map(key -> {
               List<KidStatsRecord> kidStatsRecords = dailySortedStats.get(key);
               List<Stats> newList = new ArrayList<>(kidStatsRecords.size());
@@ -94,7 +97,7 @@ public class StatsService {
               }
               return newList;
             })
-            .flatMap(list -> list.stream())
+            .flatMap(Collection::stream)
             .collect(Collectors.toList());
 
     totals.sort((t1, t2) -> t2.getDate().compareTo(t1.getDate()));
@@ -103,7 +106,7 @@ public class StatsService {
     if(log.isDebugEnabled()) {
     	String log1 = stats.stream().map(s -> {
 				try {
-					return OM.writeValueAsString(s);
+					return new ObjectMapper().writeValueAsString(s);
 				} catch (JsonProcessingException e) {
 					return e.getMessage();
 				}
@@ -111,16 +114,22 @@ public class StatsService {
     	
     	String log2 = totals.stream().map(s -> {
 				try {
-					return OM.writeValueAsString(s);
+					return new ObjectMapper().writeValueAsString(s);
 				} catch (JsonProcessingException e) {
 					return e.getMessage();
 				}
 			}).collect(Collectors.joining("\n"));
-    	
-    	log.debug("\n =========================================================================\n"
-    			+ "StatsService \n stats:\n {} \n"
-    			+ " =========================================================================\n "
-    			+ "totals\n{}", log1, log2);
+
+      log.debug("""
+               =========================================================================
+              StatsService\s
+               stats:
+               {}\s
+               =========================================================================
+               totals
+              {}""",
+              log1,
+              log2);
     }
     
     return new GetStatsResponse().stats(stats).dailyTotals(totals);
@@ -136,14 +145,10 @@ public class StatsService {
   }
 
   public void deleteStat(Stats stats) {
-    statsStore.delete(mapFromStats(stats));
+    statsStore.delete(mapToRecord(stats));
   }
 
-  private KidStatsRecord mapFromStats(Stats s) {
-  	
-		log.debug("Saving dates: from request {} to offset {}", 
-				s.getDatetime());
-  	
+  private KidStatsRecord mapToRecord(Stats s) {
   	
     return new KidStatsRecord(
             s.getToken() == null ? null : encryptorService.decLong(s.getToken()),
@@ -177,4 +182,58 @@ public class StatsService {
             .temperature(r.temperature())
             .weight(r.weight());
   }
+
+	public void storeSleep(@Valid Sleep sleep) {
+		statsStore.storeSleep(mapToRecord(sleep));
+	}
+
+	public GetSleepResponse getSleep(OffsetDateTime start, OffsetDateTime end) {
+		List<SleepRecord> sleeps = statsStore.getSleep(start, end, userService.getCurrentUserId());
+		
+		Map<LocalDate, List<SleepRecord>> sorted = sleeps.stream().collect(Collectors.groupingBy(s -> s.getSleepDay()));
+		
+		List<SleepDailyTotal> totals = new ArrayList<>();
+		
+		sorted.forEach((key, dailySleepRecords) -> {
+			
+			SleepDailyTotal total = new SleepDailyTotal();
+			total.setTotalSleep(0d);
+			total.date(key.toString());
+			
+			dailySleepRecords.forEach(r -> {
+				total.setTotalSleep(total.getTotalSleep() + r.getSleepDuration().toMinutes());
+			});
+			totals.add(total);
+		});
+			
+		List<Sleep> entries = sleeps.stream()
+				.map(s -> mapFromRecord(s))
+				.collect(Collectors.toList());
+		
+		return new GetSleepResponse()
+				.sleepDailyTotals(totals)
+				.sleepEntries(entries);
+	}
+
+  public void deleteSleep(Sleep sleep) {
+    statsStore.delete(mapToRecord(sleep));
+  }
+
+	private SleepRecord mapToRecord(@Valid Sleep sleep) {
+		
+		return new SleepRecord(
+					sleep.getToken() == null ? null : encryptorService.decLong(sleep.getToken()),
+					sleep.getCreatedAt(),
+					sleep.getSleepStart(),
+					sleep.getSleepEnd()
+				);
+	}
+	
+	private Sleep mapFromRecord(SleepRecord record) {
+		return new Sleep()
+				.token(encryptorService.encLong(record.id()))
+				.createdAt(record.createdAt())
+				.sleepStart(record.startSleep())
+				.sleepEnd(record.endSleep());
+	}
 }

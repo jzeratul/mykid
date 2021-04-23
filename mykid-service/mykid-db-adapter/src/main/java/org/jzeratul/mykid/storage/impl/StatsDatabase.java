@@ -7,8 +7,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jzeratul.mykid.model.KidStatsRecord;
+import org.jzeratul.mykid.model.SleepRecord;
+import org.jzeratul.mykid.storage.DbKidSleep;
 import org.jzeratul.mykid.storage.DbKidStats;
-import org.jzeratul.mykid.storage.DbKidStatsRepository;
+import org.jzeratul.mykid.storage.KidSleepRepository;
+import org.jzeratul.mykid.storage.KidStatsRepository;
 import org.jzeratul.mykid.storage.StatsDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +22,12 @@ public class StatsDatabase implements StatsDataStore {
 	
   private static final Logger log = LoggerFactory.getLogger(StatsDatabase.class);
 
-  private final DbKidStatsRepository statsRepository;
+  private final KidStatsRepository statsRepository;
+  private final KidSleepRepository kidSleepRepository;
 
-  public StatsDatabase(DbKidStatsRepository statsRepository) {
+  public StatsDatabase(KidStatsRepository statsRepository, KidSleepRepository kidSleepRepository) {
     this.statsRepository = statsRepository;
+		this.kidSleepRepository = kidSleepRepository;
   }
 
   @Override
@@ -32,6 +37,7 @@ public class StatsDatabase implements StatsDataStore {
 
   @Override
   public List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end, long userid) {
+  	
     List<KidStatsRecord> data = statsRepository.findByUseridAndCreatedAtBetweenOrderByDatetimeDesc(userid, start, end)
             .map(
                     list -> list.stream()
@@ -39,15 +45,12 @@ public class StatsDatabase implements StatsDataStore {
                             .collect(Collectors.toList()))
             .orElse(Collections.emptyList());
     
-
-    
     if(log.isDebugEnabled()) {
     	String log1 = data.stream().map(s -> 
     	s.id() + "," + s.weight() + "," + s.datetime().toString() + ","
 		
 			).collect(Collectors.joining("\n"));
     
-    	
     	log.debug("\n =========================================================================\n"
     			+ "StatsDatabase \n stats:\n {} \n", log1);
     }
@@ -96,4 +99,60 @@ public class StatsDatabase implements StatsDataStore {
             stats.createdAt()
     );
   }
+
+  @Override
+  public void delete(SleepRecord record) {
+  	kidSleepRepository.delete(mapToDatabaseEntity(record));
+  }
+
+	@Override
+	public void storeSleep(SleepRecord record) {
+		kidSleepRepository.save(mapToDatabaseEntity(record));
+	}
+
+	@Override
+	public List<SleepRecord> getSleep(OffsetDateTime start, OffsetDateTime end, long userid) {
+
+		List<SleepRecord> data = kidSleepRepository.findByUseridAndStartSleepAfterAndEndSleepBeforeOrderByStartSleepDesc(userid, start, end)
+		.map(
+		    list -> list.stream()
+		    .map(this::mapToDomain)
+		    .collect(Collectors.toList())
+		    )
+		.orElse(Collections.emptyList());
+    
+    if(log.isDebugEnabled()) {
+    	String log1 = data.stream()
+    			.map(s -> s.id() + 
+    					", " + 
+    					s.startSleep().toString() + 
+    					", " + 
+    					s.endSleep().toString() + 
+    					", " +
+    					s.getSleepDuration().toMinutes() + "min"
+		
+			).collect(Collectors.joining("\n"));
+    
+    	log.debug("\n =========================================================================\n"
+    			+ "StatsDatabase \n stats:\n {} \n", log1);
+    }
+		return null;
+	}
+	
+	private SleepRecord mapToDomain(DbKidSleep sleep) {
+		return new SleepRecord(
+				sleep.getId(), 
+				sleep.getStartSleep(), 
+				sleep.getEndSleep(), 
+				sleep.getCreatedAt());
+	}
+	
+	private DbKidSleep mapToDatabaseEntity(SleepRecord record) {
+		return new DbKidSleep()
+				.setId(record.id())
+				.setCreatedAt(record.createdAt())
+				.setStartSleep(record.startSleep())
+				.setEndSleep(record.endSleep());
+	}
+	
 }

@@ -12,7 +12,7 @@ const getStats = () => {
 }
 
 const deleteStat = (stat) => {
-  return axios.post(`${API_URL}/stat`, stat, { headers: authHeader() })
+  return axios.post(`${API_URL}/del-stat`, stat, { headers: authHeader() })
 }
 
 export default {

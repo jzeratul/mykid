@@ -10,6 +10,7 @@ const TRANSLATIONS = {
     "VITAMIN_K": "Vitamine K",
     "TEMPERATURE": "Temperature",
     "PUMP": "Pump",
+    "BONNISAN": "Bonnisan",
     "WEIGHT": "Weight"
   }
 }

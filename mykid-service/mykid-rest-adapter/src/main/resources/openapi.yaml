@@ -13,10 +13,10 @@ tags:
   - name: my-kid
     description: my kid
 
-paths:
-
+paths: 
+           
+                
   /v1/stats:
-
     get:
       operationId: getStats
       tags:
@@ -60,7 +60,7 @@ paths:
               $ref: '#/components/schemas/Stats'
       responses:
         '200':
-          description: all the stats available in the given interval
+          description: the stat record was saved
         default:
           description: unexpected error
           content:
@@ -68,7 +68,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /v1/stats/stat:
+  
+  /v1/stats/del-stat:
     post:
       operationId: deleteStat
       tags:
@@ -81,7 +82,7 @@ paths:
               $ref: '#/components/schemas/Stats'
       responses:
         '200':
-          description: all the stats available in the given interval
+          description: the sleep record was deleted
         default:
           description: unexpected error
           content:
@@ -135,8 +136,118 @@ paths:
                 $ref: '#/components/schemas/User'
       x-codegen-request-body-name: body
 
+
+  /v1/stats/summary:
+    get:
+      operationId: getStatsSummary
+      tags:
+        - my-kid
+      responses:
+        '200':
+          description: stats summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetStatsSummaryResponse'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+             
+
+  /v1/sleep:
+    get:
+      operationId: getSleep
+      tags:
+        - my-kid
+      responses:
+        '200':
+          description: sleep records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSleepResponse'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: saveSleep
+      tags:
+        - my-kid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sleep'
+      responses:
+        '200':
+          description: the stat record was saved
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+  /v1/sleep/del-stat:
+    post:
+      operationId: deleteSleep
+      tags:
+        - my-kid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sleep'
+      responses:
+        '200':
+          description: the sleep record was deleted
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
+
+    GetStatsSummaryResponse:
+      type: object
+      properties:
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyTotals'
+            
+    GetSleepResponse:
+      type: object
+      properties:
+        sleepEntries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sleep'
+        sleepDailyTotals:
+          type: array
+          items:
+            $ref: '#/components/schemas/SleepDailyTotal'
+
+    SleepDailyTotal:
+       type: object
+       properties:
+         date:
+           type: string
+         totalSleep:
+           type: number
+           format: double    
 
     GetStatsResponse:
       type: object
@@ -149,13 +260,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DailyTotals'
-            
+           
     DailyTotals:
       type: object
       properties:
         date:
           type: string
-        dailyFeedCount:
+        dailyFeedQuantity:
           type: number
           format: double
         weight:
@@ -164,6 +275,10 @@ components:
         dailyFeedTime:
           type: number
           format: double
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/GenericActivities'
     
     Stats:
       type: object
@@ -210,7 +325,7 @@ components:
         daycount:
           type: number
           format: double
-
+      
     GenericActivities:
       type: string
       enum:
@@ -224,13 +339,32 @@ components:
         - POOP
         - VITAMIN_D
         - VITAMIN_K
+        - BONNISAN
         - TEMPERATURE
+
+    Sleep:
+      type: object
+      properties:
+        token:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        sleepStart:
+          type: string
+          format: date-time
+        sleepEnd:
+          type: string
+          format: date-time
+      
 
     User:
       type: object
       required:
         - username
       properties:
+        token:
+          type: string
         username:
           type: string
         password:

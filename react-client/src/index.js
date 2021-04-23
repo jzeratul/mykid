@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import './css/adminlte.css';
+import './css/fontawesome/all.css';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';

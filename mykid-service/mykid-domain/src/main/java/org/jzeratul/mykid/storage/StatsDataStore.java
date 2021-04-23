@@ -1,9 +1,10 @@
 package org.jzeratul.mykid.storage;
 
-import org.jzeratul.mykid.model.KidStatsRecord;
-
 import java.time.OffsetDateTime;
 import java.util.List;
+
+import org.jzeratul.mykid.model.KidStatsRecord;
+import org.jzeratul.mykid.model.SleepRecord;
 
 public interface StatsDataStore {
 
@@ -11,5 +12,11 @@ public interface StatsDataStore {
 
   List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end, long userid);
 
-  void delete(KidStatsRecord mapFromStats);
+  void delete(KidStatsRecord record);
+
+  void delete(SleepRecord record);
+  
+  void storeSleep(SleepRecord record);
+  
+  List<SleepRecord> getSleep(OffsetDateTime start, OffsetDateTime end, long userid);
 }
