@@ -15,8 +15,13 @@ const deleteStat = (stat) => {
   return axios.post(`${API_URL}/del-stat`, stat, { headers: authHeader() })
 }
 
+const getDailyStats = () => {
+  return axios.get(`/api/v1/stats/daily`, { headers: authHeader() })
+}
+
 export default {
   saveStat,
   getStats,
-  deleteStat
+  deleteStat,
+  getDailyStats
 }

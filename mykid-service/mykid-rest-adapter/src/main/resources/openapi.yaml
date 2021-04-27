@@ -14,26 +14,12 @@ tags:
     description: my kid
 
 paths: 
-           
-                
+
   /v1/stats:
     get:
       operationId: getStats
       tags:
         - my-kid
-      parameters:
-        - name: startDate
-          in: query
-          required: false
-          description: the start date for the stats
-          schema:
-            type: string
-        - name: endDate
-          in: query
-          required: false
-          description: the end date for the stats
-          schema:
-            type: string
       responses:
         '200':
           description: all the stats available in the given interval
@@ -47,7 +33,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
     post:
       operationId: postStat
       tags:
@@ -68,7 +53,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  
   /v1/stats/del-stat:
     post:
       operationId: deleteStat
@@ -136,10 +120,9 @@ paths:
                 $ref: '#/components/schemas/User'
       x-codegen-request-body-name: body
 
-
-  /v1/stats/summary:
+  /v1/stats/daily:
     get:
-      operationId: getStatsSummary
+      operationId: getDailyStats
       tags:
         - my-kid
       responses:
@@ -148,7 +131,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetStatsSummaryResponse'
+                $ref: '#/components/schemas/GetDailyStatsResponse'
         default:
           description: unexpected error
           content:
@@ -195,7 +178,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-
   /v1/sleep/del-stat:
     post:
       operationId: deleteSleep
@@ -220,13 +202,13 @@ paths:
 components:
   schemas:
 
-    GetStatsSummaryResponse:
+    GetDailyStatsResponse:
       type: object
       properties:
-        totals:
+        dailyStats:
           type: array
           items:
-            $ref: '#/components/schemas/DailyTotals'
+            $ref: '#/components/schemas/DailyStat'
             
     GetSleepResponse:
       type: object
@@ -256,12 +238,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Stats'
-        dailyTotals:
+        dailyStats:
           type: array
           items:
-            $ref: '#/components/schemas/DailyTotals'
+            $ref: '#/components/schemas/DailyStat'
            
-    DailyTotals:
+    DailyStat:
       type: object
       properties:
         date:

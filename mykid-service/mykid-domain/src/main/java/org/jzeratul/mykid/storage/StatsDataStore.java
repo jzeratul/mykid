@@ -10,7 +10,7 @@ public interface StatsDataStore {
 
   void storeStats(KidStatsRecord record);
 
-  List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end, long userid);
+  List<KidStatsRecord> getStats(long userid);
 
   void delete(KidStatsRecord record);
 
@@ -18,5 +18,5 @@ public interface StatsDataStore {
   
   void storeSleep(SleepRecord record);
   
-  List<SleepRecord> getSleep(OffsetDateTime start, OffsetDateTime end, long userid);
+  List<SleepRecord> getSleep(long userid);
 }

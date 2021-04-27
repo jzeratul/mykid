@@ -1,11 +1,5 @@
 package org.jzeratul.mykid.storage.impl;
 
-import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.jzeratul.mykid.model.KidStatsRecord;
 import org.jzeratul.mykid.model.SleepRecord;
 import org.jzeratul.mykid.storage.DbKidSleep;
@@ -16,6 +10,12 @@ import org.jzeratul.mykid.storage.StatsDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class StatsDatabase implements StatsDataStore {
@@ -36,9 +36,11 @@ public class StatsDatabase implements StatsDataStore {
   }
 
   @Override
-  public List<KidStatsRecord> getStats(OffsetDateTime start, OffsetDateTime end, long userid) {
-  	
-    List<KidStatsRecord> data = statsRepository.findByUseridAndCreatedAtBetweenOrderByDatetimeDesc(userid, start, end)
+  public List<KidStatsRecord> getStats(long userid) {
+
+    final Optional<List<DbKidStats>> dbKidStats = statsRepository.findLastEntries(userid);
+
+    List<KidStatsRecord> data = dbKidStats
             .map(
                     list -> list.stream()
                             .map(this::mapToDomain)
@@ -111,9 +113,9 @@ public class StatsDatabase implements StatsDataStore {
 	}
 
 	@Override
-	public List<SleepRecord> getSleep(OffsetDateTime start, OffsetDateTime end, long userid) {
+	public List<SleepRecord> getSleep(long userid) {
 
-		List<SleepRecord> data = kidSleepRepository.findByUseridAndStartSleepAfterAndEndSleepBeforeOrderByStartSleepDesc(userid, start, end)
+		List<SleepRecord> data = kidSleepRepository.findSleep(userid)
 		.map(
 		    list -> list.stream()
 		    .map(this::mapToDomain)
@@ -132,11 +134,16 @@ public class StatsDatabase implements StatsDataStore {
     					s.getSleepDuration().toMinutes() + "min"
 		
 			).collect(Collectors.joining("\n"));
-    
-    	log.debug("\n =========================================================================\n"
-    			+ "StatsDatabase \n stats:\n {} \n", log1);
+
+      log.debug("""
+                       =========================================================================
+                      SleepTable\s
+                       sleeps:
+                       {}\s
+                      """,
+              log1);
     }
-		return null;
+		return data;
 	}
 	
 	private SleepRecord mapToDomain(DbKidSleep sleep) {

@@ -1,18 +1,15 @@
 package org.jzeratul.mykid.rest;
 
-import java.time.OffsetDateTime;
-import java.util.Optional;
-
-import javax.validation.Valid;
-
 import org.jzeratul.mykid.api.MyKidApi;
+import org.jzeratul.mykid.model.GetDailyStatsResponse;
 import org.jzeratul.mykid.model.GetSleepResponse;
 import org.jzeratul.mykid.model.GetStatsResponse;
-import org.jzeratul.mykid.model.GetStatsSummaryResponse;
 import org.jzeratul.mykid.model.Sleep;
 import org.jzeratul.mykid.model.Stats;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 public class StatsEndpoints implements MyKidApi {
@@ -31,24 +28,13 @@ public class StatsEndpoints implements MyKidApi {
   }
 
   @Override
-  public ResponseEntity<GetStatsResponse> getStats(Optional<String> startDate, Optional<String> endDate) {
+  public ResponseEntity<GetStatsResponse> getStats() {
 
-    OffsetDateTime start;
-    OffsetDateTime end;
-
-    if(startDate.isEmpty() || endDate.isEmpty()) {
-      end = OffsetDateTime.now();
-      start = end.minusDays(7);
-    } else {
-      start = OffsetDateTime.parse(startDate.get());
-      end = OffsetDateTime.parse(endDate.get());
-    }
-
-    var stats = statsService.getStats(start, end);
+    var stats = statsService.getStats();
 
     return ResponseEntity.ok(stats);
   }
-  
+
 
   @Override
   public ResponseEntity<Void> postStat(@Valid Stats stats) {
@@ -58,44 +44,38 @@ public class StatsEndpoints implements MyKidApi {
     return ResponseEntity.noContent().build();
   }
 
-	@Override
-	public ResponseEntity<GetStatsSummaryResponse> getStatsSummary() {
+  @Override
+  public ResponseEntity<GetDailyStatsResponse> getDailyStats() {
 
-    OffsetDateTime start = OffsetDateTime.now();
-    OffsetDateTime end = start.minusDays(1).withHour(0).withMinute(0);
-    
-    var stats = statsService.getStats(start, end);
-    
-		GetStatsSummaryResponse resp = new GetStatsSummaryResponse();
-		resp.setTotals(stats.getDailyTotals());
-		
-		return ResponseEntity.ok(resp);
-	}
+    var stats = statsService.getStats();
 
-	@Override
-	public ResponseEntity<GetSleepResponse> getSleep() {
+    GetDailyStatsResponse resp = new GetDailyStatsResponse();
+    resp.setDailyStats(stats.getDailyStats());
 
-    OffsetDateTime end = OffsetDateTime.now();
-    OffsetDateTime start = end.minusDays(7);
+    return ResponseEntity.ok(resp);
+  }
 
-    var sleep = statsService.getSleep(start, end);
-		
-		return ResponseEntity.ok(sleep);
-	}
+  @Override
+  public ResponseEntity<GetSleepResponse> getSleep() {
 
-	@Override
-	public ResponseEntity<Void> saveSleep(@Valid Sleep sleep) {
+    var sleep = statsService.getSleep();
+
+    return ResponseEntity.ok(sleep);
+  }
+
+  @Override
+  public ResponseEntity<Void> saveSleep(@Valid Sleep sleep) {
 
     statsService.storeSleep(sleep);
-    
-    return ResponseEntity.noContent().build();
-	}
 
-	@Override
-	public ResponseEntity<Void> deleteSleep(@Valid Sleep sleep) {
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteSleep(@Valid Sleep sleep) {
 
     statsService.deleteSleep(sleep);
     return ResponseEntity.ok().build();
-	}
+  }
 
 }

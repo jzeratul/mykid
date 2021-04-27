@@ -34,12 +34,6 @@ const Topbar = (props) => {
             </Nav.Item>
 
             <Nav.Item>
-              <Nav.Link href="/graphs">
-                Graphs
-              </Nav.Link>
-            </Nav.Item>
-
-            <Nav.Item>
               <Nav.Link href="/new">
                 New
               </Nav.Link>

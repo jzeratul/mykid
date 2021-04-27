@@ -1,17 +1,8 @@
 package org.jzeratul.mykid.rest;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
-
-import org.jzeratul.mykid.model.DailyTotals;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jzeratul.mykid.model.DailyStat;
 import org.jzeratul.mykid.model.GenericActivities;
 import org.jzeratul.mykid.model.GetSleepResponse;
 import org.jzeratul.mykid.model.GetStatsResponse;
@@ -27,8 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StatsService {
@@ -52,36 +49,40 @@ public class StatsService {
     statsStore.storeStats(mapToRecord(stats));
   }
 
-  public GetStatsResponse getStats(OffsetDateTime start, OffsetDateTime end) {
+  public GetStatsResponse getStats() {
 
-    Map<LocalDate, List<KidStatsRecord>> dailySortedStats = statsStore.getStats(start, end, userService.getCurrentUserId())
+    Map<LocalDate, List<KidStatsRecord>> dailySortedStats = statsStore.getStats(userService.getCurrentUserId())
             .stream()
-            .collect(Collectors.groupingBy(s -> s.getDay()));
+            .collect(Collectors.groupingBy(KidStatsRecord::getDay));
 
-    var totals = new ArrayList<DailyTotals>();
+    var totals = new ArrayList<DailyStat>();
     double lastKnownWeight = 0;
 
     for (Map.Entry<LocalDate, List<KidStatsRecord>> dailyTotals : dailySortedStats.entrySet()) {
-		
-    	 DailyTotals dt = new DailyTotals();
-       dt.date(dailyTotals.getKey().toString());
-       dt.setDailyFeedQuantity(0d);
-       dt.setDailyFeedTime(0d);
-       dt.setWeight(lastKnownWeight);
 
-       for (KidStatsRecord r : dailyTotals.getValue()) {
-      	 dt.dailyFeedQuantity(dt.getDailyFeedQuantity() + r.totalFeedQuantity());
-         dt.dailyFeedTime(dt.getDailyFeedTime() + r.totalFeedDuration());
+      DailyStat dt = new DailyStat();
+      dt.date(dailyTotals.getKey().toString());
+      dt.setDailyFeedQuantity(0d);
+      dt.setDailyFeedTime(0d);
+      dt.setWeight(lastKnownWeight);
 
-         if (r.weight() > 0) {
-           dt.setWeight(r.weight());
-           lastKnownWeight = r.weight();
-         } 
-       }
-       
-       totals.add(dt);
-		}
-    
+      for (var t : dailyTotals.getValue()) {
+        dt.dailyFeedQuantity(dt.getDailyFeedQuantity() + t.totalFeedQuantity());
+        dt.dailyFeedTime(dt.getDailyFeedTime() + t.totalFeedDuration());
+
+        if (t.weight() > 0) {
+          dt.setWeight(t.weight());
+          lastKnownWeight = t.weight();
+        }
+        
+        if(t.activities() != null) {
+        	t.activities().forEach(a -> dt.addActivitiesItem(GenericActivities.fromValue(a)));
+        }
+      }
+
+      totals.add(dt);
+    }
+
     List<Stats> stats = dailySortedStats.keySet()
             .stream()
             .sorted(Comparator.reverseOrder())
@@ -90,7 +91,7 @@ public class StatsService {
               List<Stats> newList = new ArrayList<>(kidStatsRecords.size());
               // elements are already ordered
               int i = kidStatsRecords.size();
-              for (KidStatsRecord r : kidStatsRecords) {
+              for (var r : kidStatsRecords) {
                 Stats s = mapFromRecord(r);
                 s.daycount((double) (i--));
                 newList.add(s);
@@ -102,37 +103,37 @@ public class StatsService {
 
     totals.sort((t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
-    
-    if(log.isDebugEnabled()) {
-    	String log1 = stats.stream().map(s -> {
-				try {
-					return new ObjectMapper().writeValueAsString(s);
-				} catch (JsonProcessingException e) {
-					return e.getMessage();
-				}
-			}).collect(Collectors.joining("\n"));
-    	
-    	String log2 = totals.stream().map(s -> {
-				try {
-					return new ObjectMapper().writeValueAsString(s);
-				} catch (JsonProcessingException e) {
-					return e.getMessage();
-				}
-			}).collect(Collectors.joining("\n"));
+
+    if (log.isDebugEnabled()) {
+      String log1 = stats.stream().map(s -> {
+        try {
+          return new ObjectMapper().writeValueAsString(s);
+        } catch (JsonProcessingException e) {
+          return e.getMessage();
+        }
+      }).collect(Collectors.joining("\n"));
+
+      String log2 = totals.stream().map(s -> {
+        try {
+          return new ObjectMapper().writeValueAsString(s);
+        } catch (JsonProcessingException e) {
+          return e.getMessage();
+        }
+      }).collect(Collectors.joining("\n"));
 
       log.debug("""
-               =========================================================================
-              StatsService\s
-               stats:
-               {}\s
-               =========================================================================
-               totals
-              {}""",
+                       =========================================================================
+                      StatsService\s
+                       stats:
+                       {}\s
+                       =========================================================================
+                       totals
+                      {}""",
               log1,
               log2);
     }
-    
-    return new GetStatsResponse().stats(stats).dailyTotals(totals);
+
+    return new GetStatsResponse().stats(stats).dailyStats(totals);
 
   }
 
@@ -149,7 +150,7 @@ public class StatsService {
   }
 
   private KidStatsRecord mapToRecord(Stats s) {
-  	
+
     return new KidStatsRecord(
             s.getToken() == null ? null : encryptorService.decLong(s.getToken()),
             userService.getCurrentUserId(),
@@ -183,57 +184,55 @@ public class StatsService {
             .weight(r.weight());
   }
 
-	public void storeSleep(@Valid Sleep sleep) {
-		statsStore.storeSleep(mapToRecord(sleep));
-	}
+  public void storeSleep(@Valid Sleep sleep) {
+    statsStore.storeSleep(mapToRecord(sleep));
+  }
 
-	public GetSleepResponse getSleep(OffsetDateTime start, OffsetDateTime end) {
-		List<SleepRecord> sleeps = statsStore.getSleep(start, end, userService.getCurrentUserId());
-		
-		Map<LocalDate, List<SleepRecord>> sorted = sleeps.stream().collect(Collectors.groupingBy(s -> s.getSleepDay()));
-		
-		List<SleepDailyTotal> totals = new ArrayList<>();
-		
-		sorted.forEach((key, dailySleepRecords) -> {
-			
-			SleepDailyTotal total = new SleepDailyTotal();
-			total.setTotalSleep(0d);
-			total.date(key.toString());
-			
-			dailySleepRecords.forEach(r -> {
-				total.setTotalSleep(total.getTotalSleep() + r.getSleepDuration().toMinutes());
-			});
-			totals.add(total);
-		});
-			
-		List<Sleep> entries = sleeps.stream()
-				.map(s -> mapFromRecord(s))
-				.collect(Collectors.toList());
-		
-		return new GetSleepResponse()
-				.sleepDailyTotals(totals)
-				.sleepEntries(entries);
-	}
+  public GetSleepResponse getSleep() {
+    List<SleepRecord> sleeps = statsStore.getSleep(userService.getCurrentUserId());
+
+    Map<LocalDate, List<SleepRecord>> sorted = sleeps.stream().collect(Collectors.groupingBy(SleepRecord::getSleepDay));
+
+    List<SleepDailyTotal> totals = new ArrayList<>();
+
+    sorted.forEach((key, dailySleepRecords) -> {
+
+      SleepDailyTotal total = new SleepDailyTotal();
+      total.setTotalSleep(0d);
+      total.date(key.toString());
+
+      dailySleepRecords.forEach(r -> total.setTotalSleep(total.getTotalSleep() + r.getSleepDuration().toMinutes()));
+      totals.add(total);
+    });
+
+    List<Sleep> entries = sleeps.stream()
+            .map(this::mapFromRecord)
+            .collect(Collectors.toList());
+
+    return new GetSleepResponse()
+            .sleepDailyTotals(totals)
+            .sleepEntries(entries);
+  }
 
   public void deleteSleep(Sleep sleep) {
     statsStore.delete(mapToRecord(sleep));
   }
 
-	private SleepRecord mapToRecord(@Valid Sleep sleep) {
-		
-		return new SleepRecord(
-					sleep.getToken() == null ? null : encryptorService.decLong(sleep.getToken()),
-					sleep.getCreatedAt(),
-					sleep.getSleepStart(),
-					sleep.getSleepEnd()
-				);
-	}
-	
-	private Sleep mapFromRecord(SleepRecord record) {
-		return new Sleep()
-				.token(encryptorService.encLong(record.id()))
-				.createdAt(record.createdAt())
-				.sleepStart(record.startSleep())
-				.sleepEnd(record.endSleep());
-	}
+  private SleepRecord mapToRecord(@Valid Sleep sleep) {
+
+    return new SleepRecord(
+            sleep.getToken() == null ? null : encryptorService.decLong(sleep.getToken()),
+            sleep.getCreatedAt(),
+            sleep.getSleepStart(),
+            sleep.getSleepEnd()
+    );
+  }
+
+  private Sleep mapFromRecord(SleepRecord record) {
+    return new Sleep()
+            .token(encryptorService.encLong(record.id()))
+            .createdAt(record.createdAt())
+            .sleepStart(record.startSleep())
+            .sleepEnd(record.endSleep());
+  }
 }

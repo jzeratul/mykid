@@ -18,12 +18,10 @@ const login = (username, password) => {
 };
 
 const logout = () => {
-  console.log("logout")
   localStorage.removeItem("user");
 };
 
 const getCurrentUser = () => {
-  console.log("getCurrentUser: " + JSON.parse(localStorage.getItem("user")))
   return JSON.parse(localStorage.getItem("user"));
 };
 

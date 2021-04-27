@@ -1,14 +1,16 @@
 package org.jzeratul.mykid.storage;
 
-import java.time.OffsetDateTime;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public interface KidStatsRepository extends JpaRepository<DbKidStats, Long> {
 
-  Optional<List<DbKidStats>> findByUseridAndCreatedAtBetweenOrderByDatetimeDesc(Long userid, OffsetDateTime start, OffsetDateTime end);
+  @Query("from DbKidStats S where S.userid = :userid order by S.datetime DESC ")
+  Optional<List<DbKidStats>> findLastEntries(@Param("userid") Long userid);
 }
