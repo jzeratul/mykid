@@ -35,8 +35,14 @@ const Topbar = (props) => {
 
             <Nav.Item>
               <Nav.Link href="/new">
-                New
-              </Nav.Link>
+                New entry
+  </Nav.Link>
+            </Nav.Item>
+
+            <Nav.Item>
+              <Nav.Link href="/sleep">
+                Sleep
+  </Nav.Link>
             </Nav.Item>
 
           </Nav>

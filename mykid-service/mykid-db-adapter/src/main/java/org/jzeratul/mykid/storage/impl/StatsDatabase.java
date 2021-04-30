@@ -9,10 +9,13 @@ import org.jzeratul.mykid.storage.KidStatsRepository;
 import org.jzeratul.mykid.storage.StatsDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,8 +41,39 @@ public class StatsDatabase implements StatsDataStore {
   @Override
   public List<KidStatsRecord> getStats(long userid) {
 
-    final Optional<List<DbKidStats>> dbKidStats = statsRepository.findLastEntries(userid);
+  	// these are ordered DESC on datetime already
+    final Optional<List<DbKidStats>> dbKidStats = statsRepository.findLastEntries(userid, PageRequest.of(0, 2000));
 
+    if(dbKidStats.isEmpty()) {
+    	return Collections.emptyList();
+    }
+    
+    int position = 0;
+    LocalDate currentDay = null;
+    
+    ListIterator<DbKidStats> reversedIterator = dbKidStats.get().listIterator();
+    while(reversedIterator.hasPrevious()) {
+    	DbKidStats stat = reversedIterator.previous();
+    	
+    	LocalDate date = stat.datetime().toLocalDate();
+    	
+    	if(date.equals(currentDay)) {
+    		++position;
+    	} else {
+    		position = 1;
+    		currentDay = date;
+    	}
+    	
+    	stat.setDayFeedCount(position);
+    }
+    
+    // we want to assign a dayFeedCount for each entry, that is how many feeds during a day and each feed in which possition it was
+    // to achieve this we traverse backwards, because the most recent feed is the last one
+    // e.g.: 
+    // feed #3 22:00
+    // feed #2 20:00
+    // feed #1 16:00  -> this is the oldest
+    
     List<KidStatsRecord> data = dbKidStats
             .map(
                     list -> list.stream()
@@ -98,7 +132,8 @@ public class StatsDatabase implements StatsDataStore {
             stats.extraBottleMotherMilkQuantity(),
             stats.weight(),
             stats.extraBottleFormulaeMilkQuantity(),
-            stats.createdAt()
+            stats.createdAt(),
+            stats.getDayFeedCount()
     );
   }
 
@@ -115,7 +150,7 @@ public class StatsDatabase implements StatsDataStore {
 	@Override
 	public List<SleepRecord> getSleep(long userid) {
 
-		List<SleepRecord> data = kidSleepRepository.findSleep(userid)
+		List<SleepRecord> data = kidSleepRepository.findSleep(userid, PageRequest.of(0, 1000))
 		.map(
 		    list -> list.stream()
 		    .map(this::mapToDomain)

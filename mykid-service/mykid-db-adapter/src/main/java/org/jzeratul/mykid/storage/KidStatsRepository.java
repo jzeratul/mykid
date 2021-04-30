@@ -1,5 +1,6 @@
 package org.jzeratul.mykid.storage;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,5 +13,5 @@ import java.util.Optional;
 public interface KidStatsRepository extends JpaRepository<DbKidStats, Long> {
 
   @Query("from DbKidStats S where S.userid = :userid order by S.datetime DESC ")
-  Optional<List<DbKidStats>> findLastEntries(@Param("userid") Long userid);
+  Optional<List<DbKidStats>> findLastEntries(@Param("userid") Long userid, Pageable pageable);
 }

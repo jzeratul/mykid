@@ -16,12 +16,17 @@ const deleteStat = (stat) => {
 }
 
 const getDailyStats = () => {
-  return axios.get(`/api/v1/stats/daily`, { headers: authHeader() })
+  return axios.get(`/api/v1/stats-daily`, { headers: authHeader() })
+}
+
+const getDailySleep = () => {
+  return axios.get(`/api/v1/sleep-daily`, { headers: authHeader() })
 }
 
 export default {
   saveStat,
   getStats,
   deleteStat,
-  getDailyStats
+  getDailyStats,
+  getDailySleep
 }

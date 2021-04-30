@@ -41,6 +41,8 @@ public class DbKidStats {
   @Column(name = "CREATED_AT")
   private OffsetDateTime createdAt;
 
+  private transient int dayFeedCount;
+  
   public Long id() {
     return id;
   }
@@ -157,4 +159,12 @@ public class DbKidStats {
     this.createdAt = createdAt;
     return this;
   }
+
+	public int getDayFeedCount() {
+		return dayFeedCount;
+	}
+
+	public void setDayFeedCount(int dayFeedCount) {
+		this.dayFeedCount = dayFeedCount;
+	}
 }

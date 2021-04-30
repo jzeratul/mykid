@@ -13,6 +13,7 @@ import SessionExpiredPage from "./pages/SessionExpiredPage";
 
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
+import Sleep from "./pages/Sleep";
 
 function AppRouter() {
   const [user, setUser] = useState(null);
@@ -29,6 +30,7 @@ function AppRouter() {
           <PrivateRoute component={Dashboard} path="/dashboard" exact />
           <PrivateRoute component={NewEntry} path="/new" exact />
           <PrivateRoute component={Stats} path="/stats" exact />
+          <PrivateRoute component={Sleep} path="/sleep" exact />
           <PrivateRoute component={SessionExpiredPage} path="/sessionexpired" exact />
           <PrivateRoute component={PageNotFound} path="*" />
         </Switch>

@@ -27,11 +27,9 @@ public record KidStatsRecord(
         
         double extraBottleFormulaeMilkQuantity,
         
-        OffsetDateTime createdAt) {
-	
-	public KidStatsRecord() {
-		this(null, null, null, null, 0,0,0,0,0,0,0,0,null);
-	}
+        OffsetDateTime createdAt,
+        
+        int dayFeedCount) {
 	
 	public KidStatsRecord {
 		

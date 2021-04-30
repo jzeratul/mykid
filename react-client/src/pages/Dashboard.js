@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import Topbar from "./Topbar"
 import DataService from '../services/DataService'
 import AuthService from "../services/AuthService"
-import { IconPill } from "@tabler/icons"
+import { IconBed, IconPill } from "@tabler/icons"
 import { Card, Tooltip } from "react-bootstrap"
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
@@ -15,6 +15,7 @@ const App = (props) => {
   const [lastDayStat, setLastDayStat] = useState([])
   const [vitamins, setVitamins] = useState()
   const [activities, setActivities] = useState([])
+  const [last24hSleep, setLast24hSleep] = useState()
 
   useEffect(() => {
     loadData()
@@ -138,7 +139,7 @@ const App = (props) => {
               </div>
               <div className="col-12 col-sm-6 col-md-6">
                 <div className="info-box mb-3">
-                  <span className="info-box-icon bg-default elevation-1"><IconPill size={30} color="green" stroke={3} /></span>
+                  <span className="info-box-icon bg-info elevation-1"><IconPill size={30} color="white" stroke={3} /></span>
 
                   <div className="info-box-content">
                     <span className="info-box-text">VitD/VitK/Bonnisan</span>
@@ -148,7 +149,21 @@ const App = (props) => {
                   </div>
                 </div>
               </div>
+              <div className="col-12 col-sm-6 col-md-6">
+                <div className="info-box mb-3">
+                  <span className="info-box-icon bg-warning elevation-1"><IconBed size={30} color="white" stroke={3} /></span>
+
+                  <div className="info-box-content">
+                    <span className="info-box-text">Sleep</span>
+                    <span className="info-box-number">
+                      {last24hSleep}
+                      <small>min</small>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
+
 
             <div className="row">
               <Card className="col-12 m-2">
