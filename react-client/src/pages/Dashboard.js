@@ -4,7 +4,7 @@ import DataService from '../services/DataService'
 import AuthService from "../services/AuthService"
 import { IconBed, IconPill } from "@tabler/icons"
 import { Card, Tooltip } from "react-bootstrap"
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, Legend, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 // const GENERIC_ACTIVITIES = ["VITAMIN_D", "VITAMIN_K", "BONNISAN", "SPIT", "URINE", "POOP",
 //   "BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "TEMPERATURE", "PUMP", "WEIGHT"]
@@ -19,7 +19,7 @@ const App = (props) => {
 
   useEffect(() => {
     loadData()
-  }, [])
+  })
 
   const loadData = () => {
     DataService.getDailyStats().then(
@@ -35,6 +35,8 @@ const App = (props) => {
           let bonn = countOccurences(last.activities, "BONNISAN")
 
           setVitamins(vitd + '/' + vitk + '/' + bonn)
+
+          setLast24hSleep("test")
 
           let acts = [];
 

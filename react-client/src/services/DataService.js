@@ -23,10 +23,13 @@ const getDailySleep = () => {
   return axios.get(`/api/v1/sleep-daily`, { headers: authHeader() })
 }
 
-export default {
+
+const DataService = {
   saveStat,
   getStats,
   deleteStat,
   getDailyStats,
   getDailySleep
 }
+
+export default DataService

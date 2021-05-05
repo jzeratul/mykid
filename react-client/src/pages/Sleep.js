@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import Topbar from "./Topbar"
 import DataService from '../services/DataService'
 import AuthService from "../services/AuthService"
-import { IconBed, IconPill } from "@tabler/icons"
-import Timer from 'react-compound-timer'
-import { Button, Card, Tooltip } from "react-bootstrap"
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { Card } from "react-bootstrap"
+import { Bar, BarChart, CartesianGrid, Legend, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 // const GENERIC_ACTIVITIES = ["VITAMIN_D", "VITAMIN_K", "BONNISAN", "SPIT", "URINE", "POOP",
 //   "BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "TEMPERATURE", "PUMP", "WEIGHT"]
@@ -13,13 +11,10 @@ import { Bar, BarChart, CartesianGrid, Cell, LabelList, Legend, Line, LineChart,
 const Sleep = (props) => {
 
   const [data, setData] = useState([])
-  const [timerActive, setTimerActive] = useState(false)
-
-  const [time, setTime] = useState()
 
   useEffect(() => {
     loadData()
-  }, [])
+  })
 
   const loadData = () => {
     DataService.getDailySleep().then(
@@ -35,19 +30,19 @@ const Sleep = (props) => {
       })
   }
 
-  const msToTime = (duration) => {
-    var
-      // milliseconds = parseInt((duration % 1000) / 100),
-      seconds = Math.floor((duration / 1000) % 60),
-      minutes = Math.floor((duration / (1000 * 60)) % 60),
-      hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+  // const msToTime = (duration) => {
+  //   var
+  //     // milliseconds = parseInt((duration % 1000) / 100),
+  //     seconds = Math.floor((duration / 1000) % 60),
+  //     minutes = Math.floor((duration / (1000 * 60)) % 60),
+  //     hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
 
-    hours = (hours < 10) ? "0" + hours : hours;
-    minutes = (minutes < 10) ? "0" + minutes : minutes;
-    seconds = (seconds < 10) ? "0" + seconds : seconds;
+  //   hours = (hours < 10) ? "0" + hours : hours;
+  //   minutes = (minutes < 10) ? "0" + minutes : minutes;
+  //   seconds = (seconds < 10) ? "0" + seconds : seconds;
 
-    return hours + ":" + minutes + ":" + seconds;
-  }
+  //   return hours + ":" + minutes + ":" + seconds;
+  // }
 
   return (
     <>

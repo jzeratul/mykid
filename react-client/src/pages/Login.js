@@ -24,19 +24,19 @@ const Login = (props) => {
   };
 
   const handleLogin = (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    setMessage("");
+    setMessage("")
 
     if (username === "") {
-      setMessage("username must not be empty");
+      setMessage("username must not be empty")
     } else if (password === "") {
-      setMessage("password must not be empty");
+      setMessage("password must not be empty")
     } else {
       AuthService.login(username, password).then(
         () => {
-          props.history.push("/dashboard");
-          window.location.reload();
+          props.history.push("/dashboard")
+          window.location.reload()
         },
         (error) => {
           const resMessage =
@@ -44,12 +44,12 @@ const Login = (props) => {
               error.response.data &&
               error.response.data.message) ||
             error.message ||
-            error.toString();
-          setMessage(resMessage);
+            error.toString()
+          setMessage(resMessage)
         }
-      );
+      )
     }
-  };
+  }
 
   return (
     <main className="hold-transition login-page">

@@ -1,0 +1,1 @@
+scp -r build jzeratul@192.168.0.200:/home/jzeratul/www-nginx/mykid

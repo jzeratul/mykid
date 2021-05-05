@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { IconEraser, IconRefresh } from '@tabler/icons'
 import DataService from '../services/DataService'
 import AuthService from "../services/AuthService"
-import { Alert, Button, Card, Table } from "react-bootstrap"
+import { Alert, Button, Card } from "react-bootstrap"
 
 import Moment from 'react-moment';
 import Topbar from "./Topbar"
@@ -16,7 +16,7 @@ const TabStats = (props) => {
 
   useEffect(() => {
     loadData()
-  }, [])
+  })
 
   const loadData = () => {
     DataService.getStats().then(

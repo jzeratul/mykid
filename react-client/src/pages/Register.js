@@ -33,13 +33,11 @@ const vpassword = (value) => {
 
 const Register = (props) => {
   const form = useRef()
-  const checkBtn = useRef()
 
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [password1, setPassword1] = useState("")
-  const [successful, setSuccessful] = useState(false)
   const [message, setMessage] = useState("")
 
   const onChangeUsername = (e) => {
@@ -66,7 +64,6 @@ const Register = (props) => {
     e.preventDefault()
 
     setMessage("")
-    setSuccessful(false)
 
     if (password !== password1) {
       setMessage("passwords do not match")
@@ -75,22 +72,18 @@ const Register = (props) => {
 
     form.current.validateAll();
 
-    if (checkBtn.current.context._errors.length === 0) {
-      AuthService.register(username, email, password).then(
-        (response) => {
-          setMessage(response.data.message)
-          setSuccessful(true)
-        },
-        (error) => {
-          const resMessage = (error.response && error.response.data && error.response.data.message) ||
-            error.message ||
-            error.toString()
+    AuthService.register(username, email, password).then(
+      (response) => {
+        setMessage(response.data.message)
+      },
+      (error) => {
 
-          setMessage(resMessage)
-          setSuccessful(false)
-        }
-      )
-    }
+        console.log("HERE")
+        console.log(error.response.data);
+
+        setMessage(error.response.data)
+      }
+    )
   }
 
   return (
@@ -108,7 +101,8 @@ const Register = (props) => {
 
             <Form onSubmit={handleRegister} ref={form}>
               <div className="input-group mb-3">
-                <input type="text" className="form-control" name="username" value={username} onChange={onChangeUsername} validations={[required, vusername]} />
+                <input type="text" className="form-control" name="username" autoComplete="on"
+                  value={username} onChange={onChangeUsername} validations={[required, vusername]} />
                 <div className="input-group-append">
                   <div className="input-group-text">
                     <span className="fas fa-user"></span>
@@ -116,42 +110,57 @@ const Register = (props) => {
                 </div>
               </div>
               <div className="input-group mb-3">
-                <input type="text" className="form-control" name="email" value={email} onChange={onChangeEmail} validations={[required, validEmail]} />
+                <input type="text" className="form-control" name="email" autoComplete="on"
+                  value={email} onChange={onChangeEmail} validations={[required, validEmail]} />
                 <div className="input-group-append">
                   <div className="input-group-text">
                     <span className="fas fa-envelope"></span>
                   </div>
                 </div>
               </div>
+
               <div className="input-group mb-3">
-                <input type="password" className="form-control" name="password" value={password} onChange={onChangePassword} validations={[required, vpassword]} />
+                <input type="password" className="form-control" name="password" autoComplete="on"
+                  value={password} onChange={onChangePassword} validations={[required, vpassword]} />
                 <div className="input-group-append">
                   <div className="input-group-text">
                     <span className="fas fa-lock"></span>
                   </div>
                 </div>
               </div>
+
               <div className="input-group mb-3">
-                <input type="password" className="form-control" name="password1" value={password1} onChange={onChangePassword1} validations={[required, vpassword]} />
+                <input type="password" className="form-control" name="password1" autoComplete="on"
+                  value={password1} onChange={onChangePassword1} validations={[required, vpassword]} />
                 <div className="input-group-append">
                   <div className="input-group-text">
                     <span className="fas fa-lock"></span>
                   </div>
                 </div>
               </div>
+
               <div className="row">
                 <div className="col-8">
                   <div className="icheck-primary">
                     <input type="checkbox" id="agreeTerms" name="terms" value="agree" />
-                    <label for="agreeTerms">
-                      TODO: I agree to the <a href="#">terms</a>
+                    <label>
+                      TODO: I agree to the terms: todo
                     </label>
                   </div>
                 </div>
+
                 <div className="col-4">
                   <button type="submit" className="btn btn-primary btn-block">Register</button>
                 </div>
               </div>
+
+              {message && (
+                <div className="form-group">
+                  <div className="alert alert-danger" role="alert">
+                    {message}
+                  </div>
+                </div>
+              )}
             </Form>
 
             <div className="social-auth-links text-center">
