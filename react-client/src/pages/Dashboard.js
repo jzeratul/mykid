@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react"
 import Topbar from "./Topbar"
-import DataService from '../services/DataService'
-import AuthService from "../services/AuthService"
+import { getDailyStats } from '../services/DataService'
+import { logout } from "../services/AuthService"
 import { IconBed, IconPill } from "@tabler/icons"
 import { Card, Tooltip } from "react-bootstrap"
 import { Bar, BarChart, CartesianGrid, Legend, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { useHistory } from "react-router-dom";
 
 // const GENERIC_ACTIVITIES = ["VITAMIN_D", "VITAMIN_K", "BONNISAN", "SPIT", "URINE", "POOP",
 //   "BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "TEMPERATURE", "PUMP", "WEIGHT"]
 
 const App = (props) => {
+  let history = useHistory()
 
   const [stats, setStats] = useState([])
   const [lastDayStat, setLastDayStat] = useState([])
@@ -19,15 +21,17 @@ const App = (props) => {
 
   useEffect(() => {
     loadData()
-  })
+  }, [])
 
   const loadData = () => {
-    DataService.getDailyStats().then(
-      (response) => {
-        setStats(response.data.dailyStats)
-        if (response.data.dailyStats && response.data.dailyStats.length > 0) {
 
-          let last = response.data.dailyStats[0]
+    getDailyStats().then(
+      (response) => {
+        console.log(response)
+        setStats(response.data.dailyStatsEntries)
+        if (response.data.dailyStatsEntries && response.data.dailyStatsEntries.length > 0) {
+
+          let last = response.data.dailyStatsEntries[0]
           setLastDayStat(last)
 
           let vitd = countOccurences(last.activities, "VITAMIN_D")
@@ -40,7 +44,7 @@ const App = (props) => {
 
           let acts = [];
 
-          response.data.dailyStats.forEach(
+          response.data.dailyStatsEntries.forEach(
             function (day) {
               acts.push({
                 date: day.date,
@@ -66,9 +70,8 @@ const App = (props) => {
       },
       (error) => {
         if (403 === error.response.data.status) {
-          AuthService.logout()
-          props.history.push("/login")
-          window.location.reload()
+          logout()
+          history.push('/login')
         }
       })
   }

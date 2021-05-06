@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react"
 import { IconEraser, IconRefresh } from '@tabler/icons'
-import DataService from '../services/DataService'
-import AuthService from "../services/AuthService"
+import { deleteStat, getStats } from '../services/DataService'
+import { logout } from "../services/AuthService"
 import { Alert, Button, Card } from "react-bootstrap"
+import { useHistory } from "react-router-dom";
 
 import Moment from 'react-moment';
 import Topbar from "./Topbar"
 // import { Link } from "react-router-dom"
 
 const TabStats = (props) => {
+  let history = useHistory()
 
   const [records, setRecords] = useState([])
   const [shouldDelete, setShouldDelete] = useState([])
@@ -16,21 +18,20 @@ const TabStats = (props) => {
 
   useEffect(() => {
     loadData()
-  })
+  }, [])
 
   const loadData = () => {
-    DataService.getStats().then(
+    getStats().then(
       (response) => {
-        setRecords(response.data.stats)
+        setRecords(response.data.statsEntries)
         setShouldDelete([])
         setErrorMessage([])
       },
       (error) => {
         setErrorMessage(error.toString())
         if (403 === error.response.data.status) {
-          AuthService.logout()
-          props.history.push("/login")
-          window.location.reload()
+          logout()
+          history.push('/login')
         }
       })
   }
@@ -38,18 +39,16 @@ const TabStats = (props) => {
   const deleteRecord = (r, idx) => {
 
     let tmp = [...shouldDelete]
-    console.log(tmp)
     if (tmp[idx]) {
       tmp[idx] = false
     } else {
       tmp[idx] = true
     }
-    console.log(tmp[idx] + " " + idx)
     setShouldDelete(tmp)
   }
 
   const doDelete = (r) => {
-    DataService.deleteStat(r).then(
+    deleteStat(r).then(
       (response) => {
         loadData()
       },
@@ -57,10 +56,6 @@ const TabStats = (props) => {
         setErrorMessage(error.toString())
       })
   }
-
-  // const logout = () => {
-  //   AuthService.logout()
-  // }
 
   return (
     <main>
@@ -89,7 +84,7 @@ const TabStats = (props) => {
               return (
 
                 <>
-                  <div className="col-md-6 col-sm-6 col-12" key={idx}>
+                  <div className="col-12" key={idx}>
                     <div className="info-box bg-default">
                       <span className="info-box-icon"><small>#{r.daycount}</small>
                         <Button variant="link" size="sm" onClick={() => deleteRecord(r, idx)}>del</Button>

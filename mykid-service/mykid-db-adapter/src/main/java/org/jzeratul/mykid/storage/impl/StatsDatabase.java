@@ -51,7 +51,8 @@ public class StatsDatabase implements StatsDataStore {
     int position = 0;
     LocalDate currentDay = null;
     
-    ListIterator<DbKidStats> reversedIterator = dbKidStats.get().listIterator();
+    List<DbKidStats> stats = dbKidStats.get();
+		ListIterator<DbKidStats> reversedIterator = stats.listIterator(stats.size());
     while(reversedIterator.hasPrevious()) {
     	DbKidStats stat = reversedIterator.previous();
     	

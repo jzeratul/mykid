@@ -12,8 +12,4 @@ const authHeader = () => {
   }
 }
 
-
-const AuthHeader = {
-  authHeader
-}
-export default AuthHeader
+export default authHeader

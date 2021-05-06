@@ -1,14 +1,18 @@
 import React from "react"
 import { Navbar, Image, Nav } from "react-bootstrap"
 import AppLogo from "../images/logo.svg"
-import AuthService from "../services/AuthService"
+import { logout } from "../services/AuthService"
+import { useHistory } from "react-router-dom";
+
 
 const Topbar = (props) => {
 
-  const logout = () => {
-    AuthService.logout()
-    props.history.push("/login")
-    window.location.reload()
+  let history = useHistory();
+
+  const _logout = () => {
+    logout()
+    history.push('/login')
+
   }
 
   return (
@@ -49,7 +53,7 @@ const Topbar = (props) => {
           <Nav className="justify-content-end">
 
             <Nav.Item>
-              <Nav.Link href="" onClick={logout}>
+              <Nav.Link href="" onClick={_logout}>
                 logout
               </Nav.Link>
             </Nav.Item>

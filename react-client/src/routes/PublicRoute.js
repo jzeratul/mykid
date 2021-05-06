@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Redirect } from "react-router-dom";
-import AuthService from "../services/AuthService";
+import { isLoggedIn } from "../services/AuthService";
 
 const PublicRoute = ({ component: Component, restricted, ...rest }) => (
   // restricted = false meaning public route
@@ -8,7 +8,7 @@ const PublicRoute = ({ component: Component, restricted, ...rest }) => (
   <Route
     {...rest}
     render={(props) =>
-      AuthService.isLoggedIn() && restricted ? (
+      isLoggedIn() && restricted ? (
         <Redirect to="/dashboard" />
       ) : (
         <Component {...props} />

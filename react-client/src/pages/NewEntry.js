@@ -4,10 +4,11 @@ import { IconArrowBarLeft, IconArrowBarRight, IconCapture, IconClock, IconEraser
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import TRANSLATIONS from "./translations"
-import DataService from '../services/DataService'
-import AuthService from "../services/AuthService"
+import { saveStat } from '../services/DataService'
+import { logout } from "../services/AuthService"
 import { Link } from "react-router-dom"
 import Topbar from "./Topbar"
+import { useHistory } from "react-router-dom"
 
 const GENERIC_ACTIVITIES = ["VITAMIN_D", "VITAMIN_K", "BONNISAN", "SPIT", "URINE", "POOP",
   "BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "TEMPERATURE", "PUMP", "WEIGHT"]
@@ -16,6 +17,7 @@ const FOOD_DURATION = [5, 10, 15, 20, 25, 30]
 const FOOD_QUANTITIES = [20, 30, 40, 50, 60, 70, 80, 90]
 
 const TabNewEntry = (props) => {
+  let history = useHistory()
 
   const empty_record = {
     datetime: new Date(),
@@ -176,23 +178,18 @@ const TabNewEntry = (props) => {
 
     newRecord.createdAt = new Date()
 
-    DataService.saveStat(newRecord).then(
+    saveStat(newRecord).then(
       () => {
         setNewRecord({ ...empty_record })
       },
       (error) => {
         setErrorMessage(error.toString())
         if (403 === error.response.data.status) {
-          AuthService.logout()
-          props.history.push("/login")
-          window.location.reload()
+          logout()
+          history.push('/login')
         }
       }
     );
-  }
-
-  const logout = () => {
-    AuthService.logout()
   }
 
   return (

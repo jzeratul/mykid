@@ -1,14 +1,17 @@
 import React, { useState, useRef } from "react";
 import Form from "react-validation/build/form";
 
-import AuthService from "../services/AuthService";
+import { login } from "../services/AuthService";
 import { Image } from "react-bootstrap";
 import AppLogo from "../images/logo.svg";
 import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+
 
 const Login = (props) => {
-  const form = useRef();
+  const form = useRef()
 
+  let history = useHistory()
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -33,10 +36,9 @@ const Login = (props) => {
     } else if (password === "") {
       setMessage("password must not be empty")
     } else {
-      AuthService.login(username, password).then(
+      login(username, password).then(
         () => {
-          props.history.push("/dashboard")
-          window.location.reload()
+          history.push('/dashboard')
         },
         (error) => {
           const resMessage =
@@ -72,6 +74,7 @@ const Login = (props) => {
                   name="username"
                   value={username}
                   onChange={onChangeUsername}
+                  autoComplete="on"
                 />
                 <div className="input-group-append">
                   <div className="input-group-text">
@@ -87,7 +90,9 @@ const Login = (props) => {
                   value={password}
                   onChange={onChangePassword}
                   placeholder="password"
-                />                  <div className="input-group-append">
+                  autoComplete="on"
+                />
+                <div className="input-group-append">
                   <div className="input-group-text">
                     <span className="fas fa-lock"></span>
                   </div>

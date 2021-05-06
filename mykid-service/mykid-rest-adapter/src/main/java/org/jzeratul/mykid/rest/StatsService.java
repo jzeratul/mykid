@@ -64,7 +64,8 @@ public class StatsService {
 
 		var results = new ArrayList<DailySleep>();
 
-		ListIterator<SleepRecord> listIterator = statsStore.getSleep(userService.getCurrentUserId()).listIterator();
+		List<SleepRecord> sleep = statsStore.getSleep(userService.getCurrentUserId());
+		ListIterator<SleepRecord> listIterator = sleep.listIterator(sleep.size());
 
 		LocalDate currentDay = null;
 		DailySleep daySleep = null;
@@ -89,7 +90,8 @@ public class StatsService {
 		
 		var results = new ArrayList<DailyStat>();
 		// because of the weight which is not measured at each entry, we traverse backwards
-		ListIterator<KidStatsRecord> listIterator = statsStore.getStats(userService.getCurrentUserId()).listIterator();
+		List<KidStatsRecord> stats = statsStore.getStats(userService.getCurrentUserId());
+		ListIterator<KidStatsRecord> listIterator = stats.listIterator(stats.size());
 		
 		LocalDate currentDay = null;
 		DailyStat dayStat = null;
@@ -105,6 +107,7 @@ public class StatsService {
 				dayStat.dailyFeedQuantity(0d);
 				dayStat.dailyFeedTime(0d);
 				dayStat.setWeight(0d);
+				dayStat.date(currentDay.format(DF));
 			}
 			
 			dayStat.activities(r.activities().stream().map(GenericActivities::fromValue).toList());
@@ -189,7 +192,8 @@ public class StatsService {
 				.extraBottleMotherMilkQuantity(r.extraBottleMotherMilkQuantity())
 				.extraBottleFormulaeMilkQuantity(r.extraBottleFormulaeMilkQuantity())
 				.temperature(r.temperature())
-				.weight(r.weight());
+				.weight(r.weight())
+				.daycount(r.dayFeedCount());
 	}
 
 	private Sleep mapFromRecord(SleepRecord record) {

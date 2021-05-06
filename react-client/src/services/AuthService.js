@@ -2,11 +2,11 @@ import axios from "axios"
 
 const API_URL = "/api/v1/auth/"
 
-const register = (username, email, password) => {
+export const register = (username, email, password) => {
   return axios.post(API_URL + "signup", { username, email, password })
 }
 
-const login = (username, password) => {
+export const login = (username, password) => {
   return axios
     .post(API_URL + "login", { username, password })
     .then((response) => {
@@ -17,24 +17,14 @@ const login = (username, password) => {
     })
 }
 
-const logout = () => {
+export const logout = () => {
   localStorage.removeItem("user")
 }
 
-const getCurrentUser = () => {
+export const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem("user"))
 }
 
-const isLoggedIn = () => {
+export const isLoggedIn = () => {
   return !!getCurrentUser()
 }
-
-const AuthService = {
-  register,
-  login,
-  logout,
-  getCurrentUser,
-  isLoggedIn,
-}
-
-export default AuthService

@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from "react"
 import Topbar from "./Topbar"
-import DataService from '../services/DataService'
-import AuthService from "../services/AuthService"
+import { getDailySleep } from '../services/DataService'
+import { logout } from "../services/AuthService"
 import { Card } from "react-bootstrap"
 import { Bar, BarChart, CartesianGrid, Legend, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { useHistory } from "react-router-dom";
 
 // const GENERIC_ACTIVITIES = ["VITAMIN_D", "VITAMIN_K", "BONNISAN", "SPIT", "URINE", "POOP",
 //   "BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "TEMPERATURE", "PUMP", "WEIGHT"]
 
 const Sleep = (props) => {
+  let history = useHistory()
 
   const [data, setData] = useState([])
 
   useEffect(() => {
     loadData()
-  })
+  }, [])
 
   const loadData = () => {
-    DataService.getDailySleep().then(
+    getDailySleep().then(
       (response) => {
         setData(response.data.dailyStats)
       },
       (error) => {
         if (403 === error.response.data.status) {
-          AuthService.logout()
-          props.history.push("/login")
-          window.location.reload()
+          logout()
+          history.push('/login')
         }
       })
   }

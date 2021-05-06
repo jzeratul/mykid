@@ -3,8 +3,10 @@ import Form from "react-validation/build/form"
 import { isEmail } from "validator"
 import AppLogo from "../images/logo.svg"
 
-import AuthService from "../services/AuthService"
+import { register } from "../services/AuthService"
 import { Image } from "react-bootstrap"
+import { useHistory } from "react-router-dom";
+
 import { Link } from "react-router-dom/cjs/react-router-dom.min"
 
 const required = (value) => {
@@ -33,6 +35,8 @@ const vpassword = (value) => {
 
 const Register = (props) => {
   const form = useRef()
+
+  let history = useHistory()
 
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
@@ -72,14 +76,11 @@ const Register = (props) => {
 
     form.current.validateAll();
 
-    AuthService.register(username, email, password).then(
+    register(username, email, password).then(
       (response) => {
-        setMessage(response.data.message)
+        history.push('/login')
       },
       (error) => {
-
-        console.log("HERE")
-        console.log(error.response.data);
 
         setMessage(error.response.data)
       }
