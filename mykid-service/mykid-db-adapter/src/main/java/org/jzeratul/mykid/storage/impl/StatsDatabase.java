@@ -2,6 +2,7 @@ package org.jzeratul.mykid.storage.impl;
 
 import org.jzeratul.mykid.model.KidStatsRecord;
 import org.jzeratul.mykid.model.SleepRecord;
+import org.jzeratul.mykid.storage.AdaptiveInputRepository;
 import org.jzeratul.mykid.storage.DbKidSleep;
 import org.jzeratul.mykid.storage.DbKidStats;
 import org.jzeratul.mykid.storage.KidSleepRepository;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
@@ -28,10 +31,12 @@ public class StatsDatabase implements StatsDataStore {
 
   private final KidStatsRepository statsRepository;
   private final KidSleepRepository kidSleepRepository;
+  private final AdaptiveInputRepository adaptiveInputRepository;
 
-  public StatsDatabase(KidStatsRepository statsRepository, KidSleepRepository kidSleepRepository) {
+  public StatsDatabase(KidStatsRepository statsRepository, KidSleepRepository kidSleepRepository, AdaptiveInputRepository adaptiveInputRepository) {
     this.statsRepository = statsRepository;
 		this.kidSleepRepository = kidSleepRepository;
+		this.adaptiveInputRepository = adaptiveInputRepository;
   }
 
   @Override
@@ -46,9 +51,11 @@ public class StatsDatabase implements StatsDataStore {
     final Optional<List<DbKidStats>> dbKidStats;
     
     if(timeInterval == null) {
-    	dbKidStats = statsRepository.findByUserid(userid);
+    	dbKidStats = statsRepository.findByUseridOrderByDatetimeDesc(userid);
     } else {
-    	dbKidStats = statsRepository.findByInterval(userid, timeInterval[0], timeInterval[1]);
+    	dbKidStats = statsRepository.findByInterval(userid, 
+    			OffsetDateTime.of(timeInterval[0], ZoneOffset.UTC), 
+    			OffsetDateTime.of(timeInterval[1], ZoneOffset.UTC));
     }
 
     if(dbKidStats.isEmpty()) {
@@ -203,6 +210,15 @@ public class StatsDatabase implements StatsDataStore {
 				.setCreatedAt(record.createdAt())
 				.setStartSleep(record.startSleep())
 				.setEndSleep(record.endSleep());
+	}
+
+	@Override
+	public List<KidStatsRecord> lastStats(int batchSize, long userid) {
+		
+		return adaptiveInputRepository.findStatsWithLimit(batchSize, userid)
+				.stream()
+				.map(this::mapToDomain)
+				.collect(Collectors.toList());
 	}
 	
 }

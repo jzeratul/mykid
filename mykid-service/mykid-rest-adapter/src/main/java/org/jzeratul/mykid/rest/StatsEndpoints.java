@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.jzeratul.mykid.api.MyKidApi;
+import org.jzeratul.mykid.model.GetAdaptiveInputResponse;
 import org.jzeratul.mykid.model.GetDailySleepResponse;
 import org.jzeratul.mykid.model.GetDailyStatsResponse;
 import org.jzeratul.mykid.model.GetSleepResponse;
@@ -18,9 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class StatsEndpoints implements MyKidApi {
 
   private final StatsService statsService;
+  
+  private final AdaptiveInputService adaptiveInputService;
 
-  public StatsEndpoints(StatsService statsService) {
+  public StatsEndpoints(StatsService statsService, AdaptiveInputService adaptiveInputService) {
     this.statsService = statsService;
+		this.adaptiveInputService = adaptiveInputService;
   }
 
   @Override
@@ -75,5 +79,10 @@ public class StatsEndpoints implements MyKidApi {
     statsService.storeSleep(sleep);
     return ResponseEntity.noContent().build();
   }
+
+	@Override
+	public ResponseEntity<GetAdaptiveInputResponse> getAdaptiveInput() {
+		return ResponseEntity.ok(adaptiveInputService.getAdaptiveInput());
+	}
 
 }

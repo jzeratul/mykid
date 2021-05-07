@@ -13,7 +13,7 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <groupId>org.jzeratul.mykid</groupId>
   <artifactId>mykid-service</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <packaging>pom</packaging>
 
   <name>My Kid</name>

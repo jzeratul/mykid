@@ -106,6 +106,7 @@ public class StatsService {
 		LocalDate currentDay = null;
 		DailyStat dayStat = null;
 		double lastWeight = 0;
+		LocalDate lastWeightDay = null;
 
 		while (listIterator.hasPrevious()) {
 			KidStatsRecord r = listIterator.previous();
@@ -126,9 +127,11 @@ public class StatsService {
 
 			if (r.weight() > 0) {
 				lastWeight = r.weight();
+				lastWeightDay = r.getDay();
+				dayStat.weight(lastWeight);
+				dayStat.setLastWeightDay(lastWeightDay.format(DF));
 			}
 
-			dayStat.weight(lastWeight);
 		}
 
 		Collections.reverse(results);

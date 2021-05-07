@@ -15,6 +15,25 @@ tags:
 
 paths:
 
+  /api/v1/adaptive-input:
+    get:
+      operationId: getAdaptiveInput
+      tags:
+        - my-kid
+      responses:
+        '200':
+          description: some input defaults need to change while the kid grows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAdaptiveInputResponse'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
   /api/v1/stats:
     get:
       operationId: getStats
@@ -236,6 +255,40 @@ paths:
 components:
   schemas:
 
+    GetAdaptiveInputResponse:
+      type: object
+      properties:
+        feedDurationLeft:
+          type: array
+          items:
+            type: number
+            format: double
+        feedDurationRight:
+          type: array
+          items:
+            type: number
+            format: double
+        pumpRight:
+          type: array
+          items:
+            type: number
+            format: double
+        pumpLeft:
+          type: array
+          items:
+            type: number
+            format: double
+        motherMilk:
+          type: array
+          items:
+            type: number
+            format: double
+        formulaeMilk:
+          type: array
+          items:
+            type: number
+            format: double
+
     GetDailySleepResponse:
       type: object
       properties:
@@ -343,6 +396,8 @@ components:
         weight:
           type: number
           format: double
+        lastWeightDay:
+          type: string
         dailyFeedTime:
           type: number
           format: double

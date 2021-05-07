@@ -3,7 +3,7 @@ import Topbar from "./Topbar"
 import { getDailyStats } from '../services/DataService'
 import { logout } from "../services/AuthService"
 import { IconBed, IconPill } from "@tabler/icons"
-import { Card, Tooltip } from "react-bootstrap"
+import { Button, Card, Col, Row, Tooltip } from "react-bootstrap"
 import { Bar, BarChart, CartesianGrid, Legend, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { useHistory } from "react-router-dom";
 
@@ -13,21 +13,21 @@ import { useHistory } from "react-router-dom";
 const App = (props) => {
   let history = useHistory()
 
+  const [filter, setFilter] = useState("today")
+
   const [stats, setStats] = useState([])
   const [lastDayStat, setLastDayStat] = useState([])
   const [vitamins, setVitamins] = useState()
   const [activities, setActivities] = useState([])
-  const [last24hSleep, setLast24hSleep] = useState()
 
   useEffect(() => {
-    loadData()
+    loadData("today")
   }, [])
 
-  const loadData = () => {
+  const loadData = (filter) => {
 
-    getDailyStats().then(
+    getDailyStats(filter).then(
       (response) => {
-        console.log(response)
         setStats(response.data.dailyStatsEntries)
         if (response.data.dailyStatsEntries && response.data.dailyStatsEntries.length > 0) {
 
@@ -40,7 +40,6 @@ const App = (props) => {
 
           setVitamins(vitd + '/' + vitk + '/' + bonn)
 
-          setLast24hSleep("test")
 
           let acts = [];
 
@@ -76,6 +75,12 @@ const App = (props) => {
       })
   }
 
+  const applyFilter = (filter) => {
+    setFilter(filter)
+
+    loadData(filter);
+  }
+
   const countOccurences = (arr, val) => {
     let cnt = 0;
     arr.forEach(function (item) {
@@ -92,19 +97,25 @@ const App = (props) => {
       <Topbar />
 
       <div>
-        <div class="content-header">
-          <div class="container-fluid">
-            <div class="row mb-2">
-              <div class="col-sm-6">
-              </div>
-              <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                  <li class="breadcrumb-item"><a href="/">Today</a></li>
-                  <li class="breadcrumb-item active">Yesterday</li>
-                  <li class="breadcrumb-item"><a href="/">Last 24h</a></li>
-                  <li class="breadcrumb-item"><a href="/">Last 48h</a></li>
-                  <li class="breadcrumb-item"><a href="/">Last 7d</a></li>
-                </ol>
+        <div className="content-header">
+          <div className="container-fluid">
+            <div className="row mb-2">
+
+              <div className="col-12">
+                <div className="breadcrumb float-sm-right">
+
+                  <div className="btn-group">
+                    <Button type="button" className="btn btn-xs" variant={filter === "today" ? "primary" : "link"} onClick={() => applyFilter("today")}>Today</Button>
+                    <Button type="button" className="btn btn-xs" variant={filter === "yesterday" ? "primary" : "link"} onClick={() => applyFilter("yesterday")}>Yesterday</Button>
+                    <Button type="button" className="btn btn-xs" variant={filter === "last24h" ? "primary" : "link"} onClick={() => applyFilter("last24h")}>Last 24h</Button>
+                    <Button type="button" className="btn btn-xs" variant={filter === "last48h" ? "primary" : "link"} onClick={() => applyFilter("last48h")}>Last 48h</Button>
+                    <Button type="button" className="btn btn-xs" variant={filter === "last7d" ? "primary" : "link"} onClick={() => applyFilter("last7d")}>Last 7d</Button>
+                    <Button type="button" className="btn btn-xs" variant={filter === "last1m" ? "primary" : "link"} onClick={() => applyFilter("last1m")}>Last 1m</Button>
+                    <Button type="button" className="btn btn-xs" variant={filter === "last3m" ? "primary" : "link"} onClick={() => applyFilter("last3m")}>Last 3m</Button>
+                    <Button type="button" className="btn btn-xs" variant={filter === "alltime" ? "primary" : "link"} onClick={() => applyFilter("alltime")}>All time</Button>
+                  </div>
+
+                </div>
               </div>
             </div>
           </div>
@@ -115,10 +126,15 @@ const App = (props) => {
             <div className="row">
               <div className="col-12 col-sm-6 col-md-6">
                 <div className="info-box">
+
                   <span className="info-box-icon bg-info elevation-1"><i className="fas fa-weight"></i></span>
 
                   <div className="info-box-content">
-                    <span className="info-box-text">Weight {lastDayStat.date}</span>
+                    <Row>
+                      <Col><span className="info-box-text">weight</span></Col>
+                      <Col><small className="float-sm-right">{lastDayStat.lastWeightDay}</small></Col>
+                    </Row>
+
                     <span className="info-box-number">
                       {lastDayStat.weight}
                       <small>g</small>
@@ -131,7 +147,10 @@ const App = (props) => {
                   <span className="info-box-icon bg-danger elevation-1"><i className="fas fa-clock"></i></span>
 
                   <div className="info-box-content">
-                    <span className="info-box-text">Feed time {lastDayStat.date}</span>
+                    <Row>
+                      <Col><span className="info-box-text">Feed time</span></Col>
+                      <Col><small className="float-sm-right">{lastDayStat.date}</small></Col>
+                    </Row>
                     <span className="info-box-number">
                       {lastDayStat.dailyFeedTime}
                       <small>min</small>
@@ -147,7 +166,10 @@ const App = (props) => {
                   <span className="info-box-icon bg-success elevation-1"><i className="fas fa-shopping-cart"></i></span>
 
                   <div className="info-box-content">
-                    <span className="info-box-text">Feed qty{lastDayStat.date}</span>
+                    <Row>
+                      <Col><span className="info-box-text">Feed qty</span></Col>
+                      <Col><small className="float-sm-right">{lastDayStat.date}</small></Col>
+                    </Row>
                     <span className="info-box-number">
                       {lastDayStat.dailyFeedQuantity}
                       <small>ml</small>
@@ -174,7 +196,7 @@ const App = (props) => {
                   <div className="info-box-content">
                     <span className="info-box-text">Sleep</span>
                     <span className="info-box-number">
-                      {last24hSleep}
+
                       <small>min</small>
                     </span>
                   </div>

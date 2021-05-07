@@ -1,10 +1,10 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Button, InputGroup, Container, Form, Row, Card, FormControl, Alert } from "react-bootstrap"
 import { IconArrowBarLeft, IconArrowBarRight, IconCapture, IconClock, IconEraser, IconGlassFull, IconMask, IconMoodKid } from '@tabler/icons'
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import TRANSLATIONS from "./translations"
-import { saveStat } from '../services/DataService'
+import { saveStat, getAdaptiveInput } from '../services/DataService'
 import { logout } from "../services/AuthService"
 import { Link } from "react-router-dom"
 import Topbar from "./Topbar"
@@ -13,8 +13,6 @@ import { useHistory } from "react-router-dom"
 const GENERIC_ACTIVITIES = ["VITAMIN_D", "VITAMIN_K", "BONNISAN", "SPIT", "URINE", "POOP",
   "BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "TEMPERATURE", "PUMP", "WEIGHT"]
 const TEMPERATURES = [37.6, 37.5, 37.4, 37.3, 37.2, 37.1, 37, 36.9, 36.8, 36.7, 36.6, 36.5, 36.4]
-const FOOD_DURATION = [5, 10, 15, 20, 25, 30]
-const FOOD_QUANTITIES = [20, 30, 40, 50, 60, 70, 80, 90]
 
 const TabNewEntry = (props) => {
   let history = useHistory()
@@ -34,6 +32,26 @@ const TabNewEntry = (props) => {
 
   const [newRecord, setNewRecord] = useState({ ...empty_record })
   const [errorMessage, setErrorMessage] = useState([])
+  const [adaptiveInput, setInput] = useState({});
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const loadData = () => {
+
+    getAdaptiveInput().then(
+      (response) => {
+        setInput(response.data)
+      },
+      (error) => {
+        if (403 === error.response.data.status) {
+          logout()
+          history.push('/login')
+        }
+      })
+  }
+
 
   const updateGenericActivity = (activity) => {
 
@@ -278,7 +296,7 @@ const TabNewEntry = (props) => {
                 <Card.Body>
                   <Card.Subtitle>Linker Borst Food</Card.Subtitle>
 
-                  {FOOD_DURATION.map(function (duration, idx) {
+                  {adaptiveInput.feedDurationLeft.map(function (duration, idx) {
                     return (
                       <Button key={idx} variant="outline-primary" size="md" className="mb-2" onClick={() => feedFromLeft(duration)}>{duration} min</Button>
                     )
@@ -311,7 +329,7 @@ const TabNewEntry = (props) => {
                 <Card.Body>
                   <Card.Subtitle>Rechter Borst Food</Card.Subtitle>
 
-                  {FOOD_DURATION.map(function (duration, idx) {
+                  {adaptiveInput.feedDurationRight.map(function (duration, idx) {
                     return (
                       <Button key={idx} variant="outline-primary" size="md" className="mb-2" onClick={() => feedFromRight(duration)}>{duration} min</Button>
                     )
@@ -344,7 +362,7 @@ const TabNewEntry = (props) => {
                 <Card.Body>
                   <Card.Subtitle>Bottle Mother Food</Card.Subtitle>
 
-                  {FOOD_QUANTITIES.map(function (quantity, idx) {
+                  {adaptiveInput.motherMilk.map(function (quantity, idx) {
                     return (
                       <Button key={idx} variant="outline-primary" size="md" className="mb-2" onClick={() => feedFromBottleWithMotherMilk(quantity)}>{quantity} ml</Button>
                     )
@@ -377,7 +395,7 @@ const TabNewEntry = (props) => {
                 <Card.Body>
                   <Card.Subtitle>Bottle Formlae Food</Card.Subtitle>
 
-                  {FOOD_QUANTITIES.map(function (quantity, idx) {
+                  {adaptiveInput.formulaeMilk.map(function (quantity, idx) {
                     return (
                       <Button key={idx} variant="outline-primary" size="md" className="mb-2" onClick={() => feedFromBottleWithFormulaeMilk(quantity)}>{quantity} ml</Button>
                     )
@@ -410,7 +428,7 @@ const TabNewEntry = (props) => {
                 <Card.Body>
                   <Card.Subtitle>Linker Borst Pump</Card.Subtitle>
 
-                  {FOOD_QUANTITIES.map(function (quantity, idx) {
+                  {adaptiveInput.pumpLeft.map(function (quantity, idx) {
                     return (
                       <Button key={idx} variant="outline-primary" size="md" className="mb-2" onClick={() => pumpFromLeft(quantity)}>{quantity} ml</Button>
                     )
@@ -442,7 +460,7 @@ const TabNewEntry = (props) => {
               <Card className="m-3">
                 <Card.Body>
                   <Card.Subtitle>Rechter Borst Pum</Card.Subtitle>
-                  {FOOD_QUANTITIES.map(function (quantity, idx) {
+                  {adaptiveInput.pumpRight.map(function (quantity, idx) {
                     return (
                       <Button key={idx} variant="outline-primary" size="md" className="mb-2" onClick={() => pumpFromRight(quantity)}>{quantity} ml</Button>
                     )

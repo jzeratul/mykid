@@ -19,4 +19,6 @@ public interface StatsDataStore {
   void storeSleep(SleepRecord record);
   
   void storeStats(KidStatsRecord record);
+
+	List<KidStatsRecord> lastStats(int batchSize, long userid);
 }
