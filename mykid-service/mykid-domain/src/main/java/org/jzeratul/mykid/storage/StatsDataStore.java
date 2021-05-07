@@ -1,5 +1,6 @@
 package org.jzeratul.mykid.storage;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.jzeratul.mykid.model.KidStatsRecord;
@@ -13,7 +14,7 @@ public interface StatsDataStore {
 
   List<SleepRecord> getSleep(long userid);
 
-  List<KidStatsRecord> getStats(long userid);
+  List<KidStatsRecord> getStats(LocalDateTime[] timeInterval, long userid);
   
   void storeSleep(SleepRecord record);
   

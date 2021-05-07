@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
@@ -39,10 +40,16 @@ public class StatsDatabase implements StatsDataStore {
   }
 
   @Override
-  public List<KidStatsRecord> getStats(long userid) {
+  public List<KidStatsRecord> getStats(LocalDateTime[] timeInterval, long userid) {
 
   	// these are ordered DESC on datetime already
-    final Optional<List<DbKidStats>> dbKidStats = statsRepository.findLastEntries(userid, PageRequest.of(0, 2000));
+    final Optional<List<DbKidStats>> dbKidStats;
+    
+    if(timeInterval == null) {
+    	dbKidStats = statsRepository.findByUserid(userid);
+    } else {
+    	dbKidStats = statsRepository.findByInterval(userid, timeInterval[0], timeInterval[1]);
+    }
 
     if(dbKidStats.isEmpty()) {
     	return Collections.emptyList();

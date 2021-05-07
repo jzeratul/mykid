@@ -58,6 +58,22 @@ paths:
       operationId: getDailyStats
       tags:
         - my-kid
+      parameters:
+        - in: query
+          name: history
+          schema:
+            type: string
+            enum:
+              - today
+              - yesterday
+              - last24h
+              - last48h
+              - last72h
+              - last7d
+              - last1m
+              - last3m
+              - alltime
+
       responses:
         '200':
           description: stats summary

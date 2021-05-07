@@ -1,5 +1,7 @@
 package org.jzeratul.mykid.rest;
 
+import java.util.Optional;
+
 import javax.validation.Valid;
 
 import org.jzeratul.mykid.api.MyKidApi;
@@ -44,10 +46,10 @@ public class StatsEndpoints implements MyKidApi {
 
 
   @Override
-  public ResponseEntity<GetDailyStatsResponse> getDailyStats() {  
+  public ResponseEntity<GetDailyStatsResponse> getDailyStats(@Valid Optional<String> history) {  
 
     return ResponseEntity.ok(new GetDailyStatsResponse()
-    		.dailyStatsEntries(statsService.getDailyStats()));
+    		.dailyStatsEntries(statsService.getDailyStats(history)));
   }
 
   @Override

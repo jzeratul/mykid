@@ -92,8 +92,21 @@ const App = (props) => {
       <Topbar />
 
       <div>
-        <div className="content-header">
-          <div className="container-fluid">
+        <div class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/">Today</a></li>
+                  <li class="breadcrumb-item active">Yesterday</li>
+                  <li class="breadcrumb-item"><a href="/">Last 24h</a></li>
+                  <li class="breadcrumb-item"><a href="/">Last 48h</a></li>
+                  <li class="breadcrumb-item"><a href="/">Last 7d</a></li>
+                </ol>
+              </div>
+            </div>
           </div>
         </div>
         <section className="content">
