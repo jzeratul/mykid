@@ -13,7 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 public class GlobalControllerExceptionHandler {
 	private static final Logger log = LoggerFactory.getLogger(StatsService.class);
 
-  @ExceptionHandler(Exception.class)
+  @ExceptionHandler(Throwable.class)
   public ResponseEntity<Object> handleResourceException(Exception exception, WebRequest request) {
     return handleExceptionInternal(exception, exception.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
   }

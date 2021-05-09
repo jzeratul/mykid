@@ -23,6 +23,14 @@ export const getDailySleep = () => {
   return axios.get(`${API_URL}/sleep-daily`, { headers: authHeader() })
 }
 
+export const saveSleep = (sleep) => {
+  return axios.post(`${API_URL}/sleep`, sleep, { headers: authHeader() })
+}
+
+export const deleteSleep = (sleep) => {
+  return axios.post(`${API_URL}/sleep/del-sleep`, sleep, { headers: authHeader() })
+}
+
 export const getAdaptiveInput = () => {
   return axios.get(`${API_URL}/adaptive-input`, { headers: authHeader() })
 }

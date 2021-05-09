@@ -41,6 +41,7 @@ const App = (props) => {
           setVitamins(vitd + '/' + vitk + '/' + bonn)
 
 
+
           let acts = [];
 
           response.data.dailyStatsEntries.forEach(

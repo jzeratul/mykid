@@ -1,5 +1,8 @@
 package org.jzeratul.mykid.rest;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
@@ -80,12 +83,31 @@ public class AdaptiveInputService {
 		}
 		
 		return Arrays.asList(
+				average - 40,
+				average - 30,
 				average - 20,
 				average - 10,
 				average,
 				average + 10,
 				average + 20,
-				average + 30
-				);
+				average + 30,
+				average + 40,
+				average + 50
+				).stream().filter(a -> a > 0).toList();
+	}
+	
+	public static void main(String[] args) {
+		
+		LocalDateTime ldt = LocalDateTime.now();
+		OffsetDateTime odt = OffsetDateTime.now();
+		
+		
+		System.out.println(ldt);
+		System.out.println(odt);
+		
+		System.out.println("----");
+		System.out.println(OffsetDateTime.of(ldt, ZoneOffset.UTC));
+		System.out.println(odt.toLocalDateTime());
+		
 	}
 }

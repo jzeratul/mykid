@@ -7,9 +7,9 @@ import java.time.OffsetDateTime;
 public record SleepRecord(
 
     Long id,
+    OffsetDateTime createdAt,
     OffsetDateTime startSleep,
-    OffsetDateTime endSleep,
-    OffsetDateTime createdAt
+    OffsetDateTime endSleep
     
 		) {
 	
