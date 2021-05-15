@@ -1,6 +1,6 @@
 package org.jzeratul.mykid.storage;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,16 +18,16 @@ public class DbKidSleep {
 	Long id;
 
 	@Column(name = "CREATED_AT")
-	OffsetDateTime createdAt;
+	LocalDateTime createdAt;
 
   @Column(name = "USR_ID")
   private Long userid;
   
 	@Column(name = "START_SLEEP")
-	OffsetDateTime startSleep;
+	LocalDateTime startSleep;
 
 	@Column(name = "END_SLEEP")
-	OffsetDateTime endSleep;
+	LocalDateTime endSleep;
 
 	public Long getId() {
 		return id;
@@ -47,29 +47,29 @@ public class DbKidSleep {
   	return this;
   }
 
-	public OffsetDateTime getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public DbKidSleep setCreatedAt(OffsetDateTime createdAt) {
+	public DbKidSleep setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 		return this;
 	}
 
-	public OffsetDateTime getStartSleep() {
+	public LocalDateTime getStartSleep() {
 		return startSleep;
 	}
 
-	public DbKidSleep setStartSleep(OffsetDateTime startSleep) {
+	public DbKidSleep setStartSleep(LocalDateTime startSleep) {
 		this.startSleep = startSleep;
 		return this;
 	}
 
-	public OffsetDateTime getEndSleep() {
+	public LocalDateTime getEndSleep() {
 		return endSleep;
 	}
 
-	public DbKidSleep setEndSleep(OffsetDateTime endSleep) {
+	public DbKidSleep setEndSleep(LocalDateTime endSleep) {
 		this.endSleep = endSleep;
 		return this;
 	}

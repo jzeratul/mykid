@@ -11,6 +11,8 @@ import org.jzeratul.mykid.model.GetDailyStatsResponse;
 import org.jzeratul.mykid.model.GetSleepResponse;
 import org.jzeratul.mykid.model.GetStatsResponse;
 import org.jzeratul.mykid.model.Sleep;
+import org.jzeratul.mykid.model.SleepEnd;
+import org.jzeratul.mykid.model.SleepStart;
 import org.jzeratul.mykid.model.Stats;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,11 +45,8 @@ public class StatsEndpoints implements MyKidApi {
 
   @Override
   public ResponseEntity<GetDailySleepResponse> getDailySleep() {
-
-    return ResponseEntity.ok(new GetDailySleepResponse()
-    		.dailySleepEntries(statsService.getDailySleep()));
+		return ResponseEntity.ok(statsService.getDailySleep());
   }
-
 
   @Override
   public ResponseEntity<GetDailyStatsResponse> getDailyStats(@Valid Optional<String> history) {  
@@ -73,16 +72,23 @@ public class StatsEndpoints implements MyKidApi {
     return ResponseEntity.noContent().build();
   }
 
-  @Override
-  public ResponseEntity<Void> saveSleep(@Valid Sleep sleep) {
-
-    statsService.storeSleep(sleep);
-    return ResponseEntity.noContent().build();
-  }
-
 	@Override
 	public ResponseEntity<GetAdaptiveInputResponse> getAdaptiveInput() {
 		return ResponseEntity.ok(adaptiveInputService.getAdaptiveInput());
+	}
+
+	@Override
+	public ResponseEntity<Void> endSleep(@Valid SleepEnd sleepEnd) {
+
+    statsService.storeSleep(sleepEnd);
+    return ResponseEntity.noContent().build();
+	}
+
+	@Override
+	public ResponseEntity<Void> startSleep(@Valid SleepStart sleepStart) {
+
+    statsService.storeSleep(sleepStart);
+    return ResponseEntity.noContent().build();
 	}
 
 }

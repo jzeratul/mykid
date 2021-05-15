@@ -192,8 +192,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/v1/start-sleep:
     post:
-      operationId: saveSleep
+      operationId: startSleep
       tags:
         - my-kid
       requestBody:
@@ -201,7 +202,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Sleep'
+              $ref: '#/components/schemas/SleepStart'
+      responses:
+        '200':
+          description: the stat record was saved
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/end-sleep:
+    post:
+      operationId: endSleep
+      tags:
+        - my-kid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SleepEnd'
       responses:
         '200':
           description: the stat record was saved
@@ -292,6 +313,8 @@ components:
     GetDailySleepResponse:
       type: object
       properties:
+        sleepActive:
+          type: boolean
         dailySleepEntries:
           type: array
           items:
@@ -322,6 +345,18 @@ components:
         sleepStart:
           type: string
           format: date-time
+        sleepEnd:
+          type: string
+          format: date-time
+    SleepStart:
+      type: object
+      properties:
+        sleepStart:
+          type: string
+          format: date-time
+    SleepEnd:
+      type: object
+      properties:
         sleepEnd:
           type: string
           format: date-time

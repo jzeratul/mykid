@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react"
 import Topbar from "./Topbar"
-import Timer from "react-compound-timer"
-import { getDailySleep, saveSleep } from '../services/DataService'
+import { getDailySleep, startSleep, endSleep } from '../services/DataService'
 import { logout } from "../services/AuthService"
-import { Button, Card, Row, Tooltip } from "react-bootstrap"
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { useHistory } from "react-router-dom";
+import { Button, Card, Col, Container, Row, Tooltip } from "react-bootstrap"
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { useHistory } from "react-router-dom"
+import { useStopwatch } from 'react-timer-hook'
+import Moment from "react-moment"
+import moment from 'moment';
 
 // const GENERIC_ACTIVITIES = ["VITAMIN_D", "VITAMIN_K", "BONNISAN", "SPIT", "URINE", "POOP",
 //   "BREAST_MILK", "BOTTLE_MOTHER_MILK", "BOTTLE_FORMULAE_MILK", "TEMPERATURE", "PUMP", "WEIGHT"]
@@ -14,19 +16,59 @@ const Sleep = (props) => {
   let history = useHistory()
 
   const [filter, setFilter] = useState("today")
-  const [initialTime, setInitialTime] = useState(0);
-  const [startImmediately, setStartImmediately] = useState(false);
   const [data, setData] = useState([])
-  const [started, setStarted] = useState(false)
+
+  const {
+    seconds,
+    minutes,
+    hours,
+    isRunning,
+    start,
+    pause,
+    reset,
+  } = useStopwatch({
+    autoStart: false,
+    offsetTimestamp: 0
+  })
+
+  // const {
+  //   seconds,
+  //   minutes,
+  //   hours,
+  //   isRunning,
+  //   start,
+  //   pause,
+  //   reset,
+  // } = useStopwatch({
+  //   autoStart: currentlySleeping,
+  //   offsetTimestamp: startTime
+  // })
 
   useEffect(() => {
-    loadData()
+    loadData(filter)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const loadData = () => {
-    getDailySleep().then(
+  const loadData = (filter, starttimer) => {
+    getDailySleep(filter).then(
       (response) => {
-        setData(response.data.dailyStats)
+        setData(response.data.dailySleepEntries)
+        if (response.data.dailySleepEntries && response.data.dailySleepEntries.length > 0) {
+          const recentSleep = response.data.dailySleepEntries[0]
+
+          if (response.data.sleepActive && starttimer) {
+            const sleepingTime = recentSleep.endSleep == null ? recentSleep.totalSleep : 0
+
+            const time = moment()
+            time.setSeconds(time.getSeconds() + sleepingTime)
+            reset(time)
+            start()
+          } else {
+            reset(0)
+            pause()
+          }
+
+        }
       },
       (error) => {
         if (403 === error.response.data.status) {
@@ -40,27 +82,6 @@ const Sleep = (props) => {
     setFilter(filter)
 
     loadData(filter);
-  }
-
-  const timerStarted = () => {
-    saveSleep({
-      createdAt: new Date(),
-      sleepStart: new Date()
-    }).then(
-      (response) => {
-        loadData()
-      },
-      (error) => {
-        if (403 === error.response.data.status) {
-          logout()
-          history.push('/login')
-        }
-      })
-  }
-
-  const timerStopped = () => {
-
-    setInitialTime(0)
   }
 
   // const msToTime = (duration) => {
@@ -105,6 +126,7 @@ const Sleep = (props) => {
           </div>
         </div>
       </div>
+
       <div className="mt-4">
         <section className="content">
           <div className="container-fluid">
@@ -115,45 +137,41 @@ const Sleep = (props) => {
                   <span className="info-box-icon bg-success elevation-1"><i className="fas fa-bed"></i></span>
 
                   <div className="info-box-content">
-                    <span className="info-box-text">Start/Stop sleep </span>
                     <span className="info-box-number">
 
-                      <Timer
-                        initialTime={initialTime}
-                        startImmediately={startImmediately}
-                        lastUnit="h"
-                        onStart={() => {
-                          setStarted(true)
-                          timerStarted()
-                        }}
-                        // onResume={() => console.log('onResume hook')}
-                        // onPause={() => console.log('onPause hook')}
-                        onStop={() => {
-                          setStarted(false)
-                          timerStopped()
-                        }}
-                      // onReset={() => console.log('onReset hook')}
-                      >
-                        {({ start, resume, pause, stop, reset, timerState }) => (
-                          <React.Fragment>
-                            <div>
-                              <Timer.Hours /> h
-                              <Timer.Minutes /> m
-                              <Timer.Seconds /> s
-                            </div>
+                      <Container>
 
-                            <br />
-                            <div>
-                              {!started && <Button className="btn btn-lg" variant="info" onClick={start}>Start</Button>}
-                              {/* <button onClick={pause}>Pause</button>
-                              <button onClick={resume}>Resume</button> */}
-                              {started && <Button className="btn btn-lg" variant="danger" onClick={stop}>Stop</Button>}
-                              {/* <button onClick={reset}>Reset</button> */}
-                            </div>
-                          </React.Fragment>
-                        )}
-                      </Timer>
+                        <Row>
+                          <Col><p>{isRunning ? 'Sleeping' : 'Not sleeping'}</p></Col>
+                          <Col>
+                            <p className=" float-sm-right" style={{ fontSize: '28px' }}>
+                              <span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span>
+                            </p>
+                          </Col>
+                        </Row>
 
+                        <Row>{!isRunning && <Button className="btn btn-lg" variant="info" onClick={() => {
+                          start()
+                          startSleep({
+                            sleepStart: moment()
+                          })
+                        }}>Start</Button>}
+
+                          {/* <button onClick={pause}>Pause</button> */}
+                          {/* <button onClick={resume}>Resume</button> */}
+
+                          {isRunning && <Button className="btn btn-lg" variant="danger" onClick={() => {
+
+                            endSleep({
+                              sleepEnd: moment()
+                            })
+
+                            reset(0)
+                            loadData(filter, false)
+
+                          }}>Stop</Button>}</Row>
+
+                      </Container >
 
                     </span>
                   </div>
@@ -164,25 +182,23 @@ const Sleep = (props) => {
 
             <div className="row">
               <Card className="col-12 m-2">
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart
-                    width={500}
-                    height={200}
-                    data={data}
-                    margin={{
-                      top: 10,
-                      right: 30,
-                      left: 0,
-                      bottom: 0,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="sleep" stroke="#8884d8" fill="#8884d8" />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <LineChart
+                      width={500}
+                      height={200}
+                      data={data}
+                      activeDot="true"
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" reversed={true} />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="totalSleep" stroke="#8884d8" activeDot={{ r: 8 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
 
               </Card>
             </div>
@@ -193,5 +209,62 @@ const Sleep = (props) => {
     </>
   )
 }
+
+// const MyTimer = (props) => {
+
+//   console.log(props.sleepsSince + "   " + props.currentlySleeping)
+//   const startTime = props.currentlySleeping ? (+new Date()) - (+props.sleepsSince) : 0
+//   console.log(startTime)
+
+//   const {
+//     seconds,
+//     minutes,
+//     hours,
+//     days,
+//     isRunning,
+//     start,
+//     pause,
+//     resume,
+//     reset,
+//   } = useStopwatch({
+//     autoStart: props.currentlySleeping,
+//     offsetTimestamp: startTime
+//   });
+
+//   return (
+//     <Container>
+
+//       <Row>
+//         <Col><p>{isRunning ? 'Sleeping' : 'Not sleeping'}</p></Col>
+//         <Col>
+//           <p className=" float-sm-right" style={{ fontSize: '18px' }}>
+//             <span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span>
+//           </p>
+//         </Col>
+//       </Row>
+
+//       <Row>{!isRunning && <Button className="btn btn-lg" variant="info" onClick={() => {
+//         start()
+//         saveSleep({
+//           startSleep: new Date(),
+//           endSleep: null,
+//           createdAt: new Date()
+//         })
+//       }}>Start</Button>}
+
+//         {/* <button onClick={pause}>Pause</button> */}
+//         {/* <button onClick={resume}>Resume</button> */}
+
+//         {isRunning && <Button className="btn btn-lg" variant="danger" onClick={() => {
+
+//           reset(0)
+//           pause()
+//           loadData(filter)
+
+//         }}>Stop</Button>}</Row>
+
+//     </Container >
+//   )
+// }
 
 export default Sleep

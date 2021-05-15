@@ -2,6 +2,7 @@ package org.jzeratul.mykid.rest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,11 +16,14 @@ import javax.validation.Valid;
 import org.jzeratul.mykid.model.DailySleep;
 import org.jzeratul.mykid.model.DailyStat;
 import org.jzeratul.mykid.model.GenericActivities;
+import org.jzeratul.mykid.model.GetDailySleepResponse;
 import org.jzeratul.mykid.model.GetSleepResponse;
 import org.jzeratul.mykid.model.GetStatsResponse;
 import org.jzeratul.mykid.model.KidStatsRecord;
 import org.jzeratul.mykid.model.Sleep;
+import org.jzeratul.mykid.model.SleepEnd;
 import org.jzeratul.mykid.model.SleepRecord;
+import org.jzeratul.mykid.model.SleepStart;
 import org.jzeratul.mykid.model.Stats;
 import org.jzeratul.mykid.model.UserRecord;
 import org.jzeratul.mykid.storage.StatsDataStore;
@@ -62,30 +66,38 @@ public class StatsService {
 		return userStore.find(username);
 	}
 
-	public List<DailySleep> getDailySleep() {
+	public GetDailySleepResponse getDailySleep() {
 
 		var results = new ArrayList<DailySleep>();
 
 		List<SleepRecord> sleep = statsStore.getSleep(userService.getCurrentUserId());
-		ListIterator<SleepRecord> listIterator = sleep.listIterator(sleep.size());
+		ListIterator<SleepRecord> listIterator = sleep.listIterator();
 
 		LocalDate currentDay = null;
 		DailySleep daySleep = null;
+		Boolean sleepActive = null;
+		
 		while (listIterator.hasNext()) {
 			SleepRecord r = listIterator.next();
 
+			if(sleepActive == null) { // only check the first element of the list. the list is ordered desc on date
+				sleepActive = r.endSleep() == null; 
+			}
+			
 			if (currentDay == null || !currentDay.equals(r.getSleepDay())) {
 				currentDay = r.getSleepDay();
 				daySleep = new DailySleep();
 				results.add(daySleep);
 				daySleep.date(currentDay.format(DF));
-				daySleep.setTotalSleep(Double.valueOf(r.getSleepDuration().toMinutes()));
+				Double seconds = Double.valueOf(r.getSleepDuration().toSeconds());
+				daySleep.setTotalSleep(seconds);
 			} else {
-				daySleep.setTotalSleep(daySleep.getTotalSleep() + r.getSleepDuration().toMinutes());
+				daySleep.setTotalSleep(daySleep.getTotalSleep() + r.getSleepDuration().toSeconds());
 			}
+			log.info("minutes {} start {} end {}", r.getSleepDuration().toSeconds(), r.startSleep(), r.endSleep());
 		}
 
-		return results;
+		return new GetDailySleepResponse().dailySleepEntries(results).sleepActive(sleepActive);
 	}
 
 	public List<DailyStat> getDailyStats(Optional<String> history) {
@@ -141,7 +153,8 @@ public class StatsService {
 
 	public GetSleepResponse getSleep() {
 
-		List<Sleep> entries = statsStore.getSleep(userService.getCurrentUserId()).stream().map(this::mapFromRecord)
+		List<Sleep> entries = statsStore.getSleep(userService.getCurrentUserId())
+				.stream().map(this::mapFromRecord)
 				.collect(Collectors.toList());
 
 		return new GetSleepResponse().sleepEntries(entries);
@@ -173,7 +186,11 @@ public class StatsService {
 
 	}
 
-	public void storeSleep(@Valid Sleep sleep) {
+	public void storeSleep(@Valid SleepStart sleep) {
+		statsStore.storeSleep(mapToRecord(sleep));
+	}
+
+	public void storeSleep(@Valid SleepEnd sleep) {
 		statsStore.storeSleep(mapToRecord(sleep));
 	}
 
@@ -189,26 +206,52 @@ public class StatsService {
 
 		return new Stats().token(encryptorService.encLong(r.id()))
 				.activities(r.activities().stream().map(GenericActivities::fromValue).collect(Collectors.toList()))
-				.datetime(r.datetime()).feedFromLeftDuration(r.feedFromLeftDuration())
-				.feedFromRightDuration(r.feedFromRightDuration()).pumpFromLeftQuantity(r.pumpFromLeftQuantity())
+				.datetime(r.datetime())
+				.feedFromLeftDuration(r.feedFromLeftDuration())
+				.feedFromRightDuration(r.feedFromRightDuration())
+				.pumpFromLeftQuantity(r.pumpFromLeftQuantity())
 				.pumpFromRightQuantity(r.pumpFromRightQuantity())
 				.extraBottleMotherMilkQuantity(r.extraBottleMotherMilkQuantity())
-				.extraBottleFormulaeMilkQuantity(r.extraBottleFormulaeMilkQuantity()).temperature(r.temperature())
+				.extraBottleFormulaeMilkQuantity(r.extraBottleFormulaeMilkQuantity())
+				.temperature(r.temperature())
 				.weight(r.weight()).daycount(r.dayFeedCount());
 	}
 
 	private Sleep mapFromRecord(SleepRecord record) {
-		return new Sleep().token(encryptorService.encLong(record.id())).createdAt(record.createdAt())
-				.sleepStart(record.startSleep()).sleepEnd(record.endSleep());
+		return new Sleep().token(encryptorService.encLong(record.id()))
+				.createdAt(OffsetDateTime.from(record.createdAt()))
+				.sleepStart(OffsetDateTime.from(record.startSleep()))
+				.sleepEnd(OffsetDateTime.from(record.endSleep()));
 	}
 
 	private SleepRecord mapToRecord(@Valid Sleep sleep) {
 
 		return new SleepRecord(
 				sleep.getToken() == null ? null : encryptorService.decLong(sleep.getToken()),
-				sleep.getCreatedAt(),
-				sleep.getSleepStart(),
-				sleep.getSleepEnd());
+				userService.getCurrentUserId(),
+				sleep.getCreatedAt() != null ? sleep.getCreatedAt().toLocalDateTime() : null,
+				sleep.getSleepStart() != null ? sleep.getSleepStart().toLocalDateTime() : null,
+				sleep.getSleepEnd() != null ? sleep.getSleepEnd().toLocalDateTime() : null);
+	}
+
+	private SleepRecord mapToRecord(@Valid SleepStart sleep) {
+
+		return new SleepRecord(
+				null,
+				userService.getCurrentUserId(),
+				LocalDateTime.now(),
+				sleep.getSleepStart() != null ? sleep.getSleepStart().toLocalDateTime() : null,
+				null);
+	}
+
+	private SleepRecord mapToRecord(@Valid SleepEnd sleep) {
+
+		return new SleepRecord(
+				null,
+				userService.getCurrentUserId(),
+				null,
+				null,
+				sleep.getSleepEnd() != null ? sleep.getSleepEnd().toLocalDateTime() : null);
 	}
 
 	private KidStatsRecord mapToRecord(Stats s) {

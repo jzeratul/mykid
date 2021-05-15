@@ -19,8 +19,8 @@ export const getDailyStats = (filter) => {
   return axios.get(`${API_URL}/stats-daily?history=${filter}`, { headers: authHeader() })
 }
 
-export const getDailySleep = () => {
-  return axios.get(`${API_URL}/sleep-daily`, { headers: authHeader() })
+export const getDailySleep = (filter) => {
+  return axios.get(`${API_URL}/sleep-daily?history=${filter}`, { headers: authHeader() })
 }
 
 export const saveSleep = (sleep) => {
@@ -29,6 +29,14 @@ export const saveSleep = (sleep) => {
 
 export const deleteSleep = (sleep) => {
   return axios.post(`${API_URL}/sleep/del-sleep`, sleep, { headers: authHeader() })
+}
+
+export const startSleep = (sleep) => {
+  return axios.post(`${API_URL}/start-sleep`, sleep, { headers: authHeader() })
+}
+
+export const endSleep = (sleep) => {
+  return axios.post(`${API_URL}/end-sleep`, sleep, { headers: authHeader() })
 }
 
 export const getAdaptiveInput = () => {

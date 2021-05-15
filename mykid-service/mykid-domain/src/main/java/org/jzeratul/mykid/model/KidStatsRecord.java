@@ -31,10 +31,6 @@ public record KidStatsRecord(
         
         int dayFeedCount) {
 	
-	public KidStatsRecord {
-		
-	}
-	
 	public LocalDate getDay() {
 		return datetime.toLocalDate();
 	}

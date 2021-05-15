@@ -2,31 +2,25 @@ package org.jzeratul.mykid.model;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 public record SleepRecord(
 
     Long id,
-    OffsetDateTime createdAt,
-    OffsetDateTime startSleep,
-    OffsetDateTime endSleep
+    Long userid,
+    LocalDateTime createdAt,
+    LocalDateTime startSleep,
+    LocalDateTime endSleep
     
 		) {
 	
-	public SleepRecord {
-		
-	}
-	
-	public SleepRecord() {
-		this(null, null, null, null);
-	}
-	
 	public Duration getSleepDuration() {
-		if(startSleep == null || endSleep == null) {
-			return Duration.ZERO;
+		if(endSleep == null) {
+			return Duration.between(startSleep, OffsetDateTime.now());
 		}
 		
-		return Duration.between(endSleep, startSleep);
+		return Duration.between(startSleep, endSleep);
 	}
 	
 	public LocalDate getSleepDay() {
